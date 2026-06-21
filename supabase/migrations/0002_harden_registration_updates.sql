@@ -35,3 +35,38 @@ end;
 $$;
 
 grant execute on function public.update_own_rsvp(uuid, public.rsvp_status) to authenticated;
+
+create or replace function public.set_registration_decision(
+  target_registration_id uuid,
+  next_approval_status text,
+  acting_admin_id uuid
+)
+returns public.registrations
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  updated_registration public.registrations;
+begin
+  if not public.is_admin() then
+    raise exception 'Only admins can approve or decline registrations.';
+  end if;
+
+  update public.registrations
+  set approval_status = next_approval_status::public.approval_status,
+      decided_by = acting_admin_id,
+      decided_at = now(),
+      updated_at = now()
+  where id = target_registration_id
+  returning * into updated_registration;
+
+  if updated_registration.id is null then
+    raise exception 'Registration not found.';
+  end if;
+
+  return updated_registration;
+end;
+$$;
+
+grant execute on function public.set_registration_decision(uuid, text, uuid) to authenticated;

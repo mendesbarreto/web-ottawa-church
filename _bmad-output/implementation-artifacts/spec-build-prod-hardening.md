@@ -84,67 +84,121 @@ context:
 - Run `bun run dev` without env vars → app boots in demo mode with seed data.
 - Run with `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` set → app boots against Supabase, sign-up creates a profile, registrations write through.
 
+## Spec Change Log
+
+### Loopback 1 — 2026-06-21 — Patch batch after three-reviewer audit (Blind / Edge / Acceptance)
+
+**Triggering findings:** Three-reviewer review of the done spec surfaced ~40 findings. After cascade classification, no `intent_gap` or `bad_spec` (intent was clear), so patches auto-applied and remaining findings deferred to `deferred-work.md`.
+
+**Amended:**
+- Added migrations `0005_atomic_registration_with_rpc.sql`, `0006_backfill_profiles.sql`, `0007_add_queued_log_status.sql`. Extended `0002` with `set_registration_decision` RPC. Extended `0003` trigger to read `full_name` fallback for OAuth.
+- `apps/web/src/lib/supabase.ts`:
+  - `createSupabaseRegistration` now atomic via `create_registration` RPC (fixes orphan registration + UNIQUE-on-declined retry).
+  - `createSupabaseAccount` no longer double-writes `profiles` (trigger 0003 owns it).
+  - `createSupabaseReminderLog` uses `status: 'queued'` (was misleading `'sent'`).
+  - `signOutOfSupabase` uses `scope: 'local'` (was revoking all devices).
+  - `updateSupabaseApproval` now uses `set_registration_decision` RPC (server-side `decided_at`, 0-row guard).
+  - `loadProductionState` loads `reminder_logs` (was hardcoded `[]`).
+- `apps/web/src/features/church-events/ChurchEventsApp.tsx`:
+  - `errorMessage` handles `PostgrestError` and string errors (was masking every error as "Something went wrong.").
+  - Static public pages (`/about`, `/service-times-location`, `/contact`) render immediately; loading gate only blocks portal/profile/admin.
+  - Boot effect serialized against `onAuthStateChange` `INITIAL_SESSION` race via `pendingRefresh` mutex.
+  - `handleSignIn` surfaces a clear message when Supabase returns null session (email confirmation pending).
+  - `handleSignup` calls `validateProfile` + enforces password length in production path.
+  - `EventForm.submit` has a double-submit guard.
+  - `ReviewRegistrations` disables buttons + filters during in-flight approval.
+  - `PortalPage` defensive on archived events (`if (!event) return null`); RSVP-not-yet-available action now surfaces a notice via `onInfo` prop instead of a silent no-op.
+  - `RowMenu` handles async rejections, respects `false` return for cancellation.
+- `.github/workflows/deploy.yml`:
+  - `deploy-web` no longer `needs: deploy-supabase` (independent deploys).
+  - Vite envs hoisted to job-level; added a build step that fails the master build if `VITE_SUPABASE_URL`/`VITE_SUPABASE_PUBLISHABLE_KEY` are empty (prevents silent preview-mode prod deploys).
+  - Removed dead `setup-bun` step in `deploy-web`.
+  - Reverted `SUPABASE_PROJECT_ID` secret rename back to `SUPABASE_PROJECT_REF` (matches CLI `--project-ref` flag, avoids silent breakage).
+- `README.md`: documents the revert; first-admin SQL now includes a verification query.
+
+**Known-bad state avoided:** PII leakage concerns were `reject` (0001 RLS already gates SELECT). The real silent-partial-mutation, race, and CI deploy-coupling bugs are fixed.
+
+**KEEP instructions:** Preserve the strict separation between `productionMode` and the demo/localStorage path — the demo path is critical for `bun run dev` without secrets. Preserve `errorMessage` accepting arbitrary error shapes — Supabase throws plain objects. Preserve the `pendingRefresh` mutex in the boot effect — `onAuthStateChange` emits `INITIAL_SESSION` synchronously and would otherwise race the boot promise.
+
 ## Suggested Review Order
 
 **Production Boundary**
 
 - Single env-detection flag drives every handler's demo-vs-prod branch.
-  [`ChurchEventsApp.tsx:79`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L79)
+  [`ChurchEventsApp.tsx:80`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L80)
 
 - Env detection, client factory, and the empty production state seeded before first load.
-  [`supabase.ts:65`](../../apps/web/src/lib/supabase.ts#L65)
+  [`supabase.ts:67`](../../apps/web/src/lib/supabase.ts#L67)
 
 **State Hydration**
 
-- Boot effect reconciles session, loads production state, and subscribes to auth changes.
-  [`ChurchEventsApp.tsx:95`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L95)
+- Boot effect serialized against `onAuthStateChange` race via `pendingRefresh` mutex.
+  [`ChurchEventsApp.tsx:97`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L97)
 
-- Loader pulls events, profiles, admin flag, registrations, and age counts in dependency order.
-  [`supabase.ts:106`](../../apps/web/src/lib/supabase.ts#L106)
+- Loader pulls events, profiles, admin flag, registrations, age counts, and reminder logs.
+  [`supabase.ts:108`](../../apps/web/src/lib/supabase.ts#L108)
 
 - Admin authority resolved from `admin_users` row, never from client claims.
-  [`supabase.ts:117`](../../apps/web/src/lib/supabase.ts#L117)
+  [`supabase.ts:119`](../../apps/web/src/lib/supabase.ts#L119)
 
 **Auth & Profile**
 
-- Sign-in / sign-up routed through Supabase, with dialog and notice wired to session outcome.
-  [`ChurchEventsApp.tsx:151`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L151)
+- Sign-in path guards against null session (email-confirmation-pending case).
+  [`ChurchEventsApp.tsx:163`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L163)
 
-- Sign-up upserts a profile and tolerates email-confirmation-only sessions.
-  [`supabase.ts:157`](../../apps/web/src/lib/supabase.ts#L157)
+- Sign-up delegates profile creation to the 0003 trigger (no client double-write).
+  [`supabase.ts:160`](../../apps/web/src/lib/supabase.ts#L160)
 
-- Trigger guarantees a `profiles` row for every new auth user (idempotent upsert).
+- Trigger guarantees a `profiles` row for every new auth user; reads `full_name` fallback for OAuth.
   [`0003_create_profile_on_signup.sql:1`](../../supabase/migrations/0003_create_profile_on_signup.sql#L1)
+
+- Backfill for pre-existing `auth.users` rows so existing accounts can sign in.
+  [`0006_backfill_profiles.sql:1`](../../supabase/migrations/0006_backfill_profiles.sql#L1)
 
 **Registration & RSVP**
 
-- Registration handler delegates to Supabase only after client-side validation and duplicate check.
-  [`ChurchEventsApp.tsx:209`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L209)
+- Registration handler delegates to atomic `create_registration` RPC.
+  [`supabase.ts:230`](../../apps/web/src/lib/supabase.ts#L230)
+
+- Atomic RPC inserts registration + age counts in one transaction (no orphans on partial failure).
+  [`0005_atomic_registration_with_rpc.sql:8`](../../supabase/migrations/0005_atomic_registration_with_rpc.sql#L8)
+
+- Partial unique index allows re-registration after a previous decline.
+  [`0005_atomic_registration_with_rpc.sql:3`](../../supabase/migrations/0005_atomic_registration_with_rpc.sql#L3)
 
 - Insert policy blocks registrations against unpublished/closed events at the database.
   [`0004_restrict_registration_event_insert.sql:3`](../../supabase/migrations/0004_restrict_registration_event_insert.sql#L3)
 
 - RSVP routed through the `update_own_rsvp` RPC instead of a direct table update.
-  [`ChurchEventsApp.tsx:226`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L226)
+  [`ChurchEventsApp.tsx:248`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L248)
 
 - Security-definer RPC updates only the caller's own approved row.
-  [`supabase.ts:259`](../../apps/web/src/lib/supabase.ts#L259)
+  [`supabase.ts:271`](../../apps/web/src/lib/supabase.ts#L271)
 
-- Admin-only update policy plus the RPC replace the previous loose RSVP rule.
+- Admin-only update policy plus RSVP RPC replace the previous loose rule.
   [`0002_harden_registration_updates.sql:3`](../../supabase/migrations/0002_harden_registration_updates.sql#L3)
 
 **Admin Operations**
 
-- Event create/update/status/delete and approval handlers all route through `runProduction`.
-  [`ChurchEventsApp.tsx:239`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L239)
+- Approval delegated to `set_registration_decision` RPC with server-side timestamp and 0-row guard.
+  [`ChurchEventsApp.tsx:301`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L301)
+
+- Approval buttons disable during in-flight action to prevent concurrent race.
+  [`ChurchEventsApp.tsx:790`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L790)
 
 - Generic `runProduction` wrapper: mutate, refresh from server, surface errors uniformly.
-  [`ChurchEventsApp.tsx:131`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L131)
+  [`ChurchEventsApp.tsx:141`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L141)
+
+- Error helper accepts `PostgrestError` shapes (plain objects, not `Error` instances).
+  [`ChurchEventsApp.tsx:833`](../../apps/web/src/features/church-events/ChurchEventsApp.tsx#L833)
 
 **Deploy Pipeline**
 
-- Validate job passes public Vite envs to the build so the bundle is prod-shaped.
-  [`deploy.yml:28`](../../.github/workflows/deploy.yml#L28)
+- Vite envs hoisted to job level; build fails on master if Supabase envs are empty.
+  [`deploy.yml:21`](../../.github/workflows/deploy.yml#L21)
 
-- Cloudflare Pages and Supabase migration jobs run only on master and skip cleanly when secrets are absent.
-  [`deploy.yml:43`](../../.github/workflows/deploy.yml#L43)
+- Cloudflare Pages and Supabase migration jobs run independently (no cross-job `needs`).
+  [`deploy.yml:54`](../../.github/workflows/deploy.yml#L54)
+
+- `SUPABASE_PROJECT_REF` secret matches the `--project-ref` CLI flag (silent-rename regression reverted).
+  [`deploy.yml:101`](../../.github/workflows/deploy.yml#L101)

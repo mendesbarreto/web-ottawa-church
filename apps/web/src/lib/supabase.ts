@@ -12,6 +12,8 @@ import {
   type User,
 } from '@ottawa-church/domain';
 
+export type ProductionSession = Session;
+
 type EventRow = {
   id: string;
   title: string;
@@ -131,12 +133,24 @@ export async function loadProductionState(session: Session | null): Promise<AppS
     : { data: [], error: null };
   if (ageCountsError) throw ageCountsError;
 
+  const { data: reminderLogs, error: reminderLogsError } = activeUserId
+    ? await supabase.from('reminder_logs').select('*').order('created_at', { ascending: false }).limit(20)
+    : { data: [], error: null };
+  if (reminderLogsError) throw reminderLogsError;
+
   return {
     events: (events ?? []).map((event) => mapEvent(event as EventRow)),
     users: activeUser ? [activeUser] : [],
     registrations: (registrations ?? []).map((registration) => mapRegistration(registration as RegistrationRow, (ageCounts ?? []) as AgeCountRow[])),
     notificationLogs: [],
-    reminderLogs: [],
+    reminderLogs: (reminderLogs ?? []).map((log) => ({
+      id: log.id,
+      eventId: log.event_id,
+      status: log.status,
+      recipientCount: log.recipient_count,
+      message: log.message,
+      createdAt: log.created_at,
+    })),
     activeUserId,
   };
 }
@@ -150,7 +164,7 @@ export async function signInWithSupabase(email: string, password: string) {
 
 export async function signOutOfSupabase() {
   const supabase = requireSupabase();
-  const { error } = await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut({ scope: 'local' });
   if (error) throw error;
 }
 
@@ -169,16 +183,6 @@ export async function createSupabaseAccount(input: ProfileInput & { password: st
   });
   if (error) throw error;
   if (!data.user) throw new Error('Account created, but Supabase did not return a user.');
-  if (data.session) {
-    const { error: profileError } = await supabase.from('profiles').upsert({
-      id: data.user.id,
-      name: input.name,
-      email: input.email,
-      phone: input.phone,
-      notes: input.notes ?? '',
-    });
-    if (profileError) throw profileError;
-  }
   return data.session;
 }
 
@@ -224,36 +228,32 @@ export async function createSupabaseRegistration(input: {
   notes: string;
 }) {
   const supabase = requireSupabase();
-  const { data, error } = await supabase.from('registrations').insert({
-    event_id: input.eventId,
-    user_id: input.user.id,
-    participant_name: input.user.name,
-    email: input.user.email,
-    phone: input.user.phone,
-    accompanying_count: input.accompanyingCount,
-    notes: input.notes,
-    approval_status: 'pending',
-    rsvp_status: 'unknown',
-  }).select('id').single();
+  const ageCountsPayload: Record<string, number> = {};
+  for (const range of ageRanges) {
+    ageCountsPayload[range] = input.ageCounts[range];
+  }
+  const { error } = await supabase.rpc('create_registration', {
+    target_event_id: input.eventId,
+    target_user_id: input.user.id,
+    target_participant_name: input.user.name,
+    target_email: input.user.email,
+    target_phone: input.user.phone,
+    target_accompanying_count: input.accompanyingCount,
+    target_notes: input.notes,
+    target_age_counts: ageCountsPayload,
+  });
   if (error) throw error;
-  const rows = ageRanges.map((range) => ({
-    registration_id: data.id,
-    age_range: range,
-    count: input.ageCounts[range],
-  }));
-  const { error: ageError } = await supabase.from('registration_age_counts').insert(rows);
-  if (ageError) throw ageError;
 }
 
 export async function updateSupabaseApproval(registrationId: string, approvalStatus: 'approved' | 'declined', adminUserId: string) {
   const supabase = requireSupabase();
-  const { error } = await supabase.from('registrations').update({
-    approval_status: approvalStatus,
-    decided_by: adminUserId,
-    decided_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }).eq('id', registrationId);
+  const { data, error } = await supabase.rpc('set_registration_decision', {
+    target_registration_id: registrationId,
+    next_approval_status: approvalStatus,
+    acting_admin_id: adminUserId,
+  });
   if (error) throw error;
+  if (!data) throw new Error('Registration could not be updated. It may have been removed or your admin session may have expired.');
 }
 
 export async function updateSupabaseRsvp(registrationId: string, rsvpStatus: RsvpStatus) {
@@ -269,9 +269,9 @@ export async function createSupabaseReminderLog(eventId: string, recipientCount:
   const supabase = requireSupabase();
   const { error } = await supabase.from('reminder_logs').insert({
     event_id: eventId,
-    status: recipientCount ? 'sent' : 'skipped',
+    status: recipientCount ? 'queued' : 'skipped',
     recipient_count: recipientCount,
-    message: recipientCount ? `Reminder queued for ${recipientCount} approved registration(s).` : 'No approved registrations to remind.',
+    message: recipientCount ? `Reminder queued for ${recipientCount} approved registration(s). Provider send is not yet wired in this MVP.` : 'No approved registrations to remind.',
   });
   if (error) throw error;
 }
