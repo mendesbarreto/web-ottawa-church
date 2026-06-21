@@ -1,0 +1,28 @@
+{
+  "name": "@ottawa-church/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "vite dev --host 127.0.0.1 --port 3000",
+    "build": "vite build",
+    "preview": "vite preview --port 3000",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ottawa-church/domain": "workspace:*",
+    "@tanstack/react-router": "1.170.5",
+    "@vitejs/plugin-react": "6.0.1",
+    "lucide-react": "0.545.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "vite": "8.0.13"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.0",
+    "@types/react-dom": "19.2.0"
+  }
+}

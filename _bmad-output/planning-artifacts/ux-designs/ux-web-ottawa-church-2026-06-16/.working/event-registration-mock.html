@@ -1,0 +1,1395 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ottawa Church Portal — shadcn Event Mock</title>
+    <style>
+      :root {
+        --background: #ffffff;
+        --foreground: #020817;
+        --card: #ffffff;
+        --card-foreground: #020817;
+        --muted: #f1f5f9;
+        --muted-foreground: #64748b;
+        --border: #e2e8f0;
+        --input: #e2e8f0;
+        --ring: #7c3aed;
+        --primary: #7c3aed;
+        --primary-foreground: #ffffff;
+        --secondary: #f1f5f9;
+        --secondary-foreground: #0f172a;
+        --destructive: #dc2626;
+        --destructive-foreground: #ffffff;
+        --success: #15803d;
+        --warning: #a16207;
+        --radius: 0.75rem;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+
+      .container {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+      }
+
+      .brand {
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        color: var(--muted-foreground);
+        font-size: 14px;
+      }
+
+      .nav-links span:first-child {
+        color: var(--foreground);
+        font-weight: 600;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        border: 1px solid transparent;
+        border-radius: calc(var(--radius) - 2px);
+        background: var(--primary);
+        color: var(--primary-foreground);
+        padding: 0 16px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: default;
+        white-space: nowrap;
+      }
+
+      .button.secondary {
+        border-color: var(--border);
+        background: var(--background);
+        color: var(--foreground);
+      }
+
+      .button.ghost {
+        background: transparent;
+        color: var(--foreground);
+      }
+
+      .button.destructive {
+        background: var(--destructive);
+        color: var(--destructive-foreground);
+      }
+
+      .link-button {
+        border: 0;
+        background: transparent;
+        color: var(--foreground);
+        padding: 0;
+        font: inherit;
+        font-weight: 700;
+        text-align: left;
+        cursor: default;
+      }
+
+      .link-button:hover {
+        color: var(--primary);
+      }
+
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      main {
+        padding: 40px 0 72px;
+      }
+
+      .hero {
+        padding: 28px 0 24px;
+      }
+
+      .eyebrow {
+        color: var(--muted-foreground);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 760px;
+        margin-top: 10px;
+        font-size: clamp(36px, 5vw, 60px);
+        line-height: 1;
+        letter-spacing: -0.05em;
+      }
+
+      h2 {
+        font-size: 24px;
+        line-height: 1.2;
+        letter-spacing: -0.025em;
+      }
+
+      h3 {
+        font-size: 15px;
+        line-height: 1.25;
+      }
+
+      .lead {
+        max-width: 680px;
+        margin-top: 16px;
+        color: var(--muted-foreground);
+        font-size: 17px;
+      }
+
+      .stack {
+        display: grid;
+        gap: 24px;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+        color: var(--card-foreground);
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        border-bottom: 1px solid var(--border);
+        padding: 20px 24px;
+      }
+
+      .card-description {
+        margin-top: 6px;
+        color: var(--muted-foreground);
+        font-size: 14px;
+      }
+
+      .card-content {
+        padding: 0;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .input {
+        height: 40px;
+        min-width: 240px;
+        border: 1px solid var(--input);
+        border-radius: calc(var(--radius) - 2px);
+        padding: 0 12px;
+        color: var(--foreground);
+        font: inherit;
+        font-size: 14px;
+      }
+
+      .select {
+        height: 40px;
+        border: 1px solid var(--input);
+        border-radius: calc(var(--radius) - 2px);
+        background: var(--background);
+        padding: 0 12px;
+        color: var(--foreground);
+        font: inherit;
+        font-size: 14px;
+      }
+
+      .custom-select {
+        position: relative;
+        min-width: 190px;
+      }
+
+      .select-trigger {
+        display: inline-flex;
+        width: 100%;
+        height: 40px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border: 1px solid var(--input);
+        border-radius: calc(var(--radius) - 2px);
+        background: var(--background);
+        color: var(--foreground);
+        padding: 0 12px;
+        font: inherit;
+        font-size: 14px;
+        cursor: default;
+      }
+
+      .select-trigger:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.14);
+        border-color: var(--ring);
+      }
+
+      .select-menu {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        z-index: 40;
+        display: none;
+        width: 100%;
+        min-width: 190px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--background);
+        box-shadow:
+          0 10px 15px -3px rgba(15, 23, 42, 0.12),
+          0 4px 6px -4px rgba(15, 23, 42, 0.12);
+        padding: 4px;
+      }
+
+      .custom-select.open .select-menu {
+        display: grid;
+      }
+
+      .select-item {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--foreground);
+        padding: 9px 10px;
+        font: inherit;
+        font-size: 14px;
+        text-align: left;
+        cursor: default;
+      }
+
+      .select-item:hover,
+      .select-item[aria-selected="true"] {
+        background: var(--muted);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        vertical-align: middle;
+        font-size: 14px;
+      }
+
+      th {
+        height: 48px;
+        color: var(--muted-foreground);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .event-title {
+        display: grid;
+        gap: 4px;
+      }
+
+      .event-meta {
+        color: var(--muted-foreground);
+        font-size: 13px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        height: 24px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        padding: 0 10px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .badge.not-registered {
+        border-color: #ddd6fe;
+        background: #f5f3ff;
+        color: #5b21b6;
+      }
+
+      .badge.pending {
+        border-color: #fde68a;
+        background: #fffbeb;
+        color: var(--warning);
+      }
+
+      .badge.approved {
+        border-color: #bbf7d0;
+        background: #f0fdf4;
+        color: var(--success);
+      }
+
+      .badge.not-attending {
+        border-color: #fecaca;
+        background: #fef2f2;
+        color: var(--destructive);
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+
+      .row-actions {
+        position: relative;
+        display: inline-flex;
+        justify-content: flex-end;
+      }
+
+      .icon-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--border);
+        border-radius: calc(var(--radius) - 2px);
+        background: var(--background);
+        color: var(--foreground);
+        font-size: 20px;
+        line-height: 1;
+        cursor: default;
+      }
+
+      .menu-content {
+        position: absolute;
+        top: calc(100% + 6px);
+        right: 0;
+        z-index: 30;
+        display: none;
+        min-width: 180px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: calc(var(--radius) - 2px);
+        background: var(--background);
+        box-shadow:
+          0 10px 15px -3px rgba(15, 23, 42, 0.12),
+          0 4px 6px -4px rgba(15, 23, 42, 0.12);
+        padding: 4px;
+      }
+
+      .row-actions.open .menu-content {
+        display: grid;
+      }
+
+      .menu-item {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--foreground);
+        padding: 9px 10px;
+        font: inherit;
+        font-size: 14px;
+        text-align: left;
+        cursor: default;
+      }
+
+      .menu-item:hover {
+        background: var(--muted);
+      }
+
+      .menu-item.destructive {
+        color: var(--destructive);
+      }
+
+      .metric {
+        padding: 20px;
+      }
+
+      .metric-value {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+      }
+
+      .metric-label {
+        margin-top: 4px;
+        color: var(--muted-foreground);
+        font-size: 13px;
+      }
+
+      .dialog-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(2, 8, 23, 0.42);
+        padding: 20px;
+      }
+
+      .dialog-backdrop.open {
+        display: flex;
+      }
+
+      .dialog {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        width: min(560px, calc(100vw - 40px));
+        max-height: min(860px, 92vh);
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--background);
+        box-shadow:
+          0 20px 25px -5px rgba(15, 23, 42, 0.16),
+          0 8px 10px -6px rgba(15, 23, 42, 0.16);
+      }
+
+      .dialog-header,
+      .dialog-footer {
+        padding: 24px;
+      }
+
+      .dialog-header {
+        border-bottom: 1px solid var(--border);
+      }
+
+      .dialog-body {
+        display: grid;
+        gap: 18px;
+        max-height: calc(92vh - 176px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 24px;
+      }
+
+      .dialog-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        border-top: 1px solid var(--border);
+        background: var(--background);
+      }
+
+      label {
+        display: grid;
+        gap: 7px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      label span {
+        color: var(--foreground);
+      }
+
+      .field {
+        width: 100%;
+        min-width: 0;
+        height: 40px;
+        border: 1px solid var(--input);
+        border-radius: calc(var(--radius) - 2px);
+        padding: 0 12px;
+        font: inherit;
+      }
+
+      textarea.field {
+        height: auto;
+        min-height: 84px;
+        padding-top: 10px;
+        resize: vertical;
+      }
+
+      .age-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .age-row {
+        display: grid;
+        grid-template-columns: minmax(72px, 120px) 1fr;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid var(--border);
+        border-radius: calc(var(--radius) - 2px);
+        padding: 10px 12px;
+      }
+
+      .age-row span {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .age-row .field {
+        justify-self: end;
+        width: 112px;
+      }
+
+      .hint {
+        color: var(--muted-foreground);
+        font-size: 13px;
+      }
+
+      .details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .detail-item {
+        border: 1px solid var(--border);
+        border-radius: calc(var(--radius) - 2px);
+        padding: 12px;
+      }
+
+      .detail-item strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 13px;
+      }
+
+      .people-list {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .people-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1px solid var(--border);
+        border-radius: calc(var(--radius) - 2px);
+        padding: 10px 12px;
+      }
+
+      @media (max-width: 860px) {
+        .nav-links,
+        .hero-actions {
+          display: none;
+        }
+
+        .hero {
+          grid-template-columns: 1fr;
+        }
+
+        .summary-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        table,
+        thead,
+        tbody,
+        tr,
+        th,
+        td {
+          display: block;
+        }
+
+        thead {
+          display: none;
+        }
+
+        tr {
+          border-bottom: 1px solid var(--border);
+          padding: 14px 0;
+        }
+
+        td {
+          border-bottom: 0;
+          padding: 8px 24px;
+        }
+
+        .dialog {
+          width: min(100%, calc(100vw - 24px));
+        }
+
+        .age-row {
+          grid-template-columns: 1fr;
+        }
+
+        .age-row .field {
+          justify-self: stretch;
+          width: 100%;
+        }
+
+        .details-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <div class="brand">Ottawa Church</div>
+        <nav class="nav-links" aria-label="Primary navigation">
+          <span>Events</span>
+          <span>About</span>
+          <span>Service Times</span>
+          <span>Contact</span>
+        </nav>
+        <div class="nav-actions">
+          <button class="button secondary" type="button">Sign in</button>
+          <button class="button signup-button" type="button">Sign up</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container stack">
+      <section class="hero">
+        <div>
+          <div class="eyebrow">Events and Registration</div>
+          <h1>Register for church events with clarity and care.</h1>
+          <p class="lead">
+            A fast church portal for upcoming events, participant registration,
+            approval status, RSVP updates, calendar files, and admin rosters.
+          </p>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="events-title">
+        <div class="card-header">
+          <div>
+            <h2 id="events-title">Upcoming events</h2>
+            <p class="card-description">
+              Event status appears directly in the table so participants can see what needs action.
+            </p>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input class="input" value="Search events" aria-label="Search events" />
+          <div class="custom-select" data-select>
+            <button class="select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span>All statuses</span>
+              <span aria-hidden="true">⌄</span>
+            </button>
+            <div class="select-menu" role="listbox" aria-label="Filter by status">
+              <button class="select-item" type="button" role="option" aria-selected="true">All statuses</button>
+              <button class="select-item" type="button" role="option">Not registered</button>
+              <button class="select-item" type="button" role="option">Pending approval</button>
+              <button class="select-item" type="button" role="option">Approved</button>
+              <button class="select-item" type="button" role="option">Not attending</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-content">
+          <table>
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th style="text-align: right">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="event-title">
+                    <button class="link-button details-button" data-event="Strawberry Harvest Picnic" type="button">
+                      Strawberry Harvest Picnic
+                    </button>
+                    <span class="event-meta">Family-friendly. Bring sun hats and water bottles.</span>
+                  </div>
+                </td>
+                <td>Jul 12 · 10:00 AM</td>
+                <td>Ottawa Community Farm</td>
+                <td><span class="badge not-registered">Not registered</span></td>
+                <td style="text-align: right">
+                  <div class="row-actions">
+                    <button class="icon-button menu-trigger" type="button" aria-label="Open actions for Strawberry Harvest Picnic">⋯</button>
+                    <div class="menu-content">
+                      <button class="menu-item details-button" data-event="Strawberry Harvest Picnic" type="button">Details</button>
+                      <button class="menu-item register-button" data-event="Strawberry Harvest Picnic" type="button">Register</button>
+                      <button class="menu-item" type="button">Add to calendar</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="event-title">
+                    <button class="link-button details-button" data-event="Church BBQ" type="button">Church BBQ</button>
+                    <span class="event-meta">Food planning depends on approved registration counts.</span>
+                  </div>
+                </td>
+                <td>Jul 26 · 4:00 PM</td>
+                <td>Church backyard</td>
+                <td><span class="badge pending">Pending approval</span></td>
+                <td style="text-align: right">
+                  <div class="row-actions">
+                    <button class="icon-button menu-trigger" type="button" aria-label="Open actions for Church BBQ">⋯</button>
+                    <div class="menu-content">
+                      <button class="menu-item details-button" data-event="Church BBQ" type="button">Details</button>
+                      <button class="menu-item" type="button">View status</button>
+                      <button class="menu-item" type="button">Add to calendar</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="event-title">
+                    <button class="link-button details-button" data-event="Family Camping Weekend" type="button">
+                      Family Camping Weekend
+                    </button>
+                    <span class="event-meta">Approved participants can add the event to their calendar.</span>
+                  </div>
+                </td>
+                <td>Aug 15 · Friday</td>
+                <td>Silver Lake Campground</td>
+                <td><span class="badge approved">Approved</span></td>
+                <td style="text-align: right">
+                  <div class="row-actions">
+                    <button class="icon-button menu-trigger" type="button" aria-label="Open actions for Family Camping Weekend">⋯</button>
+                    <div class="menu-content">
+                      <button class="menu-item details-button" data-event="Family Camping Weekend" type="button">Details</button>
+                      <button class="menu-item" type="button">Add calendar</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="event-title">
+                    <button class="link-button details-button" data-event="Community Service Day" type="button">
+                      Community Service Day
+                    </button>
+                    <span class="event-meta">Participants can update RSVP if plans change.</span>
+                  </div>
+                </td>
+                <td>Aug 30 · 9:00 AM</td>
+                <td>Downtown Ottawa</td>
+                <td><span class="badge not-attending">Not attending</span></td>
+                <td style="text-align: right">
+                  <div class="row-actions">
+                    <button class="icon-button menu-trigger" type="button" aria-label="Open actions for Community Service Day">⋯</button>
+                    <div class="menu-content">
+                      <button class="menu-item details-button" data-event="Community Service Day" type="button">Details</button>
+                      <button class="menu-item" type="button">Update RSVP</button>
+                      <button class="menu-item" type="button">Add to calendar</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="admin-title">
+        <div class="card-header">
+          <div>
+            <div class="eyebrow">Admin state</div>
+            <h2 id="admin-title">Event management</h2>
+            <p class="card-description">
+              Admins see planning totals, pending approvals, and export/reminder actions for each event.
+            </p>
+          </div>
+          <button class="button create-event-button" type="button">Create event</button>
+        </div>
+
+        <div class="toolbar">
+          <input class="input" placeholder="Search events" aria-label="Search admin events" />
+          <div class="custom-select" data-select>
+            <button class="select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span>Upcoming events</span>
+              <span aria-hidden="true">⌄</span>
+            </button>
+            <div class="select-menu" role="listbox" aria-label="Filter admin events">
+              <button class="select-item" type="button" role="option" aria-selected="true">Upcoming events</button>
+              <button class="select-item" type="button" role="option">Draft events</button>
+              <button class="select-item" type="button" role="option">Archived events</button>
+            </div>
+          </div>
+          <button class="button secondary" type="button">Export all</button>
+        </div>
+
+        <div class="summary-grid" style="padding: 24px; border-bottom: 1px solid var(--border)">
+          <article class="card metric">
+            <div class="metric-value">12</div>
+            <div class="metric-label">Pending approvals</div>
+          </article>
+          <article class="card metric">
+            <div class="metric-value">38</div>
+            <div class="metric-label">Approved people</div>
+          </article>
+          <article class="card metric">
+            <div class="metric-value">14</div>
+            <div class="metric-label">Children 4–12</div>
+          </article>
+          <article class="card metric">
+            <div class="metric-value">6</div>
+            <div class="metric-label">Not attending</div>
+          </article>
+        </div>
+
+        <div class="card-content">
+          <table>
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Pending</th>
+                <th>Approved</th>
+                <th>Age range signal</th>
+                <th style="text-align: right">Admin actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="event-title">
+                    <strong>Strawberry Harvest Picnic</strong>
+                    <span class="event-meta">Published · Jul 12 · Ottawa Community Farm</span>
+                  </div>
+                </td>
+                <td><span class="badge pending">7 pending</span></td>
+                <td>24 people</td>
+                <td>4–12 is highest</td>
+                <td style="text-align: right">
+                  <div class="row-actions">
+                    <button class="icon-button menu-trigger" type="button" aria-label="Open admin actions for Strawberry Harvest Picnic">⋯</button>
+                    <div class="menu-content">
+                      <button class="menu-item" type="button">Review</button>
+                      <button class="menu-item" type="button">Roster</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="event-title">
+                    <strong>Church BBQ</strong>
+                    <span class="event-meta">Published · Jul 26 · Church backyard</span>
+                  </div>
+                </td>
+                <td><span class="badge pending">5 pending</span></td>
+                <td>14 people</td>
+                <td>18+ is highest</td>
+                <td style="text-align: right">
+                  <div class="row-actions">
+                    <button class="icon-button menu-trigger" type="button" aria-label="Open admin actions for Church BBQ">⋯</button>
+                    <div class="menu-content">
+                      <button class="menu-item" type="button">Review</button>
+                      <button class="menu-item" type="button">Send reminder</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="approval-title">
+        <div class="card-header">
+          <div>
+            <div class="eyebrow">Approval queue</div>
+            <h2 id="approval-title">Strawberry Harvest Picnic</h2>
+            <p class="card-description">
+              Admins approve or decline event registrations without leaving the event context.
+            </p>
+          </div>
+          <button class="button secondary" type="button">Download CSV</button>
+        </div>
+
+        <div class="card-content">
+          <table>
+            <thead>
+              <tr>
+                <th>Participant</th>
+                <th>Group</th>
+                <th>Age ranges</th>
+                <th>Note</th>
+                <th style="text-align: right">Decision</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="event-title">
+                    <strong>Maria Santos</strong>
+                    <span class="event-meta">maria@example.com</span>
+                  </div>
+                </td>
+                <td>3 people</td>
+                <td>4–12: 2 · 18+: 1</td>
+                <td>One allergy note</td>
+                <td style="text-align: right">
+                  <div class="row-actions">
+                    <button class="icon-button menu-trigger" type="button" aria-label="Open decision actions for Maria Santos">⋯</button>
+                    <div class="menu-content">
+                      <button class="menu-item" type="button">Approve</button>
+                      <button class="menu-item destructive" type="button">Decline</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="event-title">
+                    <strong>João Mendes</strong>
+                    <span class="event-meta">joao@example.com</span>
+                  </div>
+                </td>
+                <td>4 people</td>
+                <td>0–3: 1 · 4–12: 2 · 18+: 1</td>
+                <td>Needs ride info</td>
+                <td style="text-align: right">
+                  <div class="row-actions">
+                    <button class="icon-button menu-trigger" type="button" aria-label="Open decision actions for João Mendes">⋯</button>
+                    <div class="menu-content">
+                      <button class="menu-item" type="button">Approve</button>
+                      <button class="menu-item destructive" type="button">Decline</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <div class="dialog-backdrop" id="account-modal" role="dialog" aria-modal="true" aria-labelledby="account-modal-title">
+      <div class="dialog">
+        <div class="dialog-header">
+          <div class="eyebrow">Website sign up</div>
+          <h2 id="account-modal-title">Create your church account</h2>
+          <p class="card-description">
+            Use this account to register for events, check approval status, and update RSVP later.
+          </p>
+        </div>
+
+        <form class="dialog-body">
+          <span class="badge not-registered">Website account</span>
+
+          <label>
+            <span>Full name</span>
+            <input class="field" id="modal-name" value="Maria Santos" />
+          </label>
+
+          <label>
+            <span>Email</span>
+            <input class="field" id="modal-email" value="maria@example.com" />
+          </label>
+
+          <label>
+            <span>Phone</span>
+            <input class="field" id="modal-phone" value="(613) 555-0198" />
+          </label>
+
+          <label>
+            <span>Password</span>
+            <input class="field" id="modal-password" type="password" value="example-password" />
+          </label>
+
+          <p class="hint">Event registration happens after sign-in from the Register button on each event row.</p>
+        </form>
+
+        <div class="dialog-footer">
+          <button class="button secondary close-dialog" type="button">Cancel</button>
+          <button class="button" type="button">Create account</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-backdrop" id="event-modal" role="dialog" aria-modal="true" aria-labelledby="event-modal-title">
+      <div class="dialog">
+        <div class="dialog-header">
+          <div class="eyebrow">Event registration</div>
+          <h2 id="event-modal-title">Register for event</h2>
+          <p class="card-description" id="event-modal-subtitle">
+            You are signed in as Maria Santos. Submit this event registration for admin approval.
+          </p>
+        </div>
+
+        <form class="dialog-body">
+          <span class="badge approved">Signed in</span>
+
+          <label>
+            <span>Participant</span>
+            <input class="field" value="Maria Santos" />
+          </label>
+
+          <label>
+            <span>Accompanying people</span>
+            <input class="field" value="2" />
+          </label>
+
+          <p class="hint">Include yourself in the age ranges. With 2 accompanying people, age ranges must total 3.</p>
+
+          <div class="age-grid" aria-label="Age range counts">
+            <label class="age-row">
+              <span>0–3</span>
+              <input class="field" value="0" />
+            </label>
+            <label class="age-row">
+              <span>4–12</span>
+              <input class="field" value="2" />
+            </label>
+            <label class="age-row">
+              <span>13–17</span>
+              <input class="field" value="0" />
+            </label>
+            <label class="age-row">
+              <span>18+</span>
+              <input class="field" value="1" />
+            </label>
+          </div>
+
+          <label>
+            <span>Notes for the admin team</span>
+            <textarea class="field" placeholder="Optional"></textarea>
+          </label>
+        </form>
+
+        <div class="dialog-footer">
+          <button class="button secondary close-dialog" type="button">Cancel</button>
+          <button class="button" type="button">Submit registration</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-backdrop" id="details-modal" role="dialog" aria-modal="true" aria-labelledby="details-modal-title">
+      <div class="dialog">
+        <div class="dialog-header">
+          <div class="eyebrow">Event details</div>
+          <h2 id="details-modal-title">Strawberry Harvest Picnic</h2>
+          <p class="card-description" id="details-modal-subtitle">
+            Everything a signed-in participant needs before deciding or preparing to attend.
+          </p>
+        </div>
+
+        <div class="dialog-body">
+          <div class="details-grid">
+            <div class="detail-item">
+              <strong>Date and time</strong>
+              <span id="details-date">Saturday, July 12 · 10:00 AM–2:00 PM</span>
+            </div>
+            <div class="detail-item">
+              <strong>Location</strong>
+              <a id="details-location" href="https://maps.google.com/?q=Ottawa+Community+Farm" target="_blank" rel="noreferrer">
+                Ottawa Community Farm
+              </a>
+            </div>
+            <div class="detail-item">
+              <strong>Capacity</strong>
+              <span>60 people · approval required</span>
+            </div>
+            <div class="detail-item">
+              <strong>Cost</strong>
+              <span>Free event</span>
+            </div>
+            <div class="detail-item">
+              <strong>Bring</strong>
+              <span>Sun hats, water bottles, picnic blankets</span>
+            </div>
+            <div class="detail-item">
+              <strong>Transportation</strong>
+              <span>Carpool note available after approval</span>
+            </div>
+            <div class="detail-item">
+              <strong>Waiver / consent</strong>
+              <span>No waiver required for this event</span>
+            </div>
+            <div class="detail-item">
+              <strong>Volunteer needs</strong>
+              <span>Setup, cleanup, snack table</span>
+            </div>
+          </div>
+
+          <div>
+            <h3>People going</h3>
+            <p class="hint">
+              Visible only to signed-in participants. Public visitors should see event details, not participant names.
+            </p>
+            <ul class="people-list">
+              <li><span>Maria Santos</span><span class="badge approved">Approved</span></li>
+              <li><span>Carla Oliveira</span><span class="badge approved">Approved</span></li>
+              <li><span>João Mendes</span><span class="badge pending">Pending approval</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="dialog-footer">
+          <button class="button secondary close-dialog" type="button">Close</button>
+          <button class="button register-button" data-event="Strawberry Harvest Picnic" type="button">Register</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-backdrop" id="create-event-modal" role="dialog" aria-modal="true" aria-labelledby="create-event-title">
+      <div class="dialog">
+        <div class="dialog-header">
+          <div class="eyebrow">Admin event setup</div>
+          <h2 id="create-event-title">Create event</h2>
+          <p class="card-description">
+            Add the public event details, registration rules, and planning notes admins need.
+          </p>
+        </div>
+
+        <form class="dialog-body">
+          <label>
+            <span>Event title</span>
+            <input class="field" value="New church event" />
+          </label>
+
+          <div class="age-grid">
+            <label>
+              <span>Date</span>
+              <input class="field" value="2026-09-12" />
+            </label>
+            <label>
+              <span>Start time</span>
+              <input class="field" value="10:00 AM" />
+            </label>
+          </div>
+
+          <label>
+            <span>Location</span>
+            <input class="field" value="Ottawa Church" />
+          </label>
+
+          <label>
+            <span>Maps link</span>
+            <input class="field" value="https://maps.google.com/?q=Ottawa+Church" />
+          </label>
+
+          <label>
+            <span>Description</span>
+            <textarea class="field" placeholder="Describe the event for members, newcomers, and visitors."></textarea>
+          </label>
+
+          <div class="age-grid">
+            <label>
+              <span>Capacity</span>
+              <input class="field" value="60" />
+            </label>
+            <label>
+              <span>Cost</span>
+              <input class="field" value="Free" />
+            </label>
+          </div>
+
+          <label>
+            <span>Required items</span>
+            <input class="field" value="Water bottle, comfortable shoes" />
+          </label>
+
+          <label>
+            <span>Transportation note</span>
+            <input class="field" value="Carpool details shared after approval" />
+          </label>
+
+          <label>
+            <span>Waiver / consent note</span>
+            <input class="field" value="No waiver required" />
+          </label>
+
+          <label>
+            <span>Volunteer needs</span>
+            <input class="field" value="Setup, cleanup, welcome table" />
+          </label>
+
+          <label>
+            <span>Publication status</span>
+            <select class="field">
+              <option>Draft</option>
+              <option>Published</option>
+              <option>Archived</option>
+            </select>
+          </label>
+        </form>
+
+        <div class="dialog-footer">
+          <button class="button secondary close-dialog" type="button">Cancel</button>
+          <button class="button" type="button">Save event</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const accountModal = document.querySelector("#account-modal");
+      const eventModal = document.querySelector("#event-modal");
+      const detailsModal = document.querySelector("#details-modal");
+      const createEventModal = document.querySelector("#create-event-modal");
+      const eventModalTitle = document.querySelector("#event-modal-title");
+      const detailsModalTitle = document.querySelector("#details-modal-title");
+
+      document.querySelectorAll(".signup-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          accountModal.classList.add("open");
+          document.querySelector("#modal-name").focus();
+        });
+      });
+
+      document.querySelectorAll(".menu-trigger").forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          document.querySelectorAll(".custom-select.open").forEach((openSelect) => {
+            openSelect.classList.remove("open");
+            openSelect.querySelector(".select-trigger")?.setAttribute("aria-expanded", "false");
+          });
+          const rowActions = button.closest(".row-actions");
+          document.querySelectorAll(".row-actions.open").forEach((openMenu) => {
+            if (openMenu !== rowActions) openMenu.classList.remove("open");
+          });
+          rowActions.classList.toggle("open");
+        });
+      });
+
+      document.querySelectorAll("[data-select]").forEach((select) => {
+        const trigger = select.querySelector(".select-trigger");
+        const triggerText = trigger.querySelector("span");
+        const items = select.querySelectorAll(".select-item");
+
+        trigger.addEventListener("click", (event) => {
+          event.stopPropagation();
+          document.querySelectorAll(".row-actions.open").forEach((openMenu) => {
+            openMenu.classList.remove("open");
+          });
+          document.querySelectorAll(".custom-select.open").forEach((openSelect) => {
+            if (openSelect !== select) {
+              openSelect.classList.remove("open");
+              openSelect.querySelector(".select-trigger")?.setAttribute("aria-expanded", "false");
+            }
+          });
+          const isOpen = select.classList.toggle("open");
+          trigger.setAttribute("aria-expanded", String(isOpen));
+        });
+
+        items.forEach((item) => {
+          item.addEventListener("click", (event) => {
+            event.stopPropagation();
+            items.forEach((candidate) => candidate.setAttribute("aria-selected", "false"));
+            item.setAttribute("aria-selected", "true");
+            triggerText.textContent = item.textContent;
+            select.classList.remove("open");
+            trigger.setAttribute("aria-expanded", "false");
+          });
+        });
+      });
+
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".row-actions.open").forEach((openMenu) => {
+          openMenu.classList.remove("open");
+        });
+        document.querySelectorAll(".custom-select.open").forEach((openSelect) => {
+          openSelect.classList.remove("open");
+          openSelect.querySelector(".select-trigger")?.setAttribute("aria-expanded", "false");
+        });
+      });
+
+      document.querySelectorAll(".register-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          const eventName = button.dataset.event;
+          detailsModal.classList.remove("open");
+          eventModalTitle.textContent = `Register for ${eventName}`;
+          eventModal.classList.add("open");
+        });
+      });
+
+      document.querySelectorAll(".details-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          const eventName = button.dataset.event;
+          detailsModalTitle.textContent = eventName;
+          detailsModal.classList.add("open");
+        });
+      });
+
+      document.querySelectorAll(".create-event-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          createEventModal.classList.add("open");
+        });
+      });
+
+      document.querySelectorAll(".close-dialog").forEach((button) => {
+        button.addEventListener("click", () => {
+          accountModal.classList.remove("open");
+          eventModal.classList.remove("open");
+          detailsModal.classList.remove("open");
+          createEventModal.classList.remove("open");
+        });
+      });
+
+      document.querySelectorAll(".dialog-backdrop").forEach((modal) => {
+        modal.addEventListener("click", (event) => {
+          if (event.target === modal) modal.classList.remove("open");
+        });
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          accountModal.classList.remove("open");
+          eventModal.classList.remove("open");
+          detailsModal.classList.remove("open");
+          createEventModal.classList.remove("open");
+        }
+      });
+    </script>
+  </body>
+</html>
