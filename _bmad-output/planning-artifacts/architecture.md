@@ -133,8 +133,8 @@ Project initialization using this monorepo shape should remain the first impleme
 - Web framework: TanStack Start React app under `apps/web`.
 - UI: Tailwind v4 plus shadcn-style primitives and the approved violet/neutral design tokens.
 - Domain: shared TypeScript package under `packages/domain` for events, registrations, approvals, RSVP, `.ics`, and CSV logic.
-- Data: start with local/free-tier-compatible adapters for the working MVP; keep the persistence boundary Supabase/Postgres-compatible for free-tier production.
-- Auth/security: MVP may use local/demo auth state, but architecture must preserve a future Supabase Auth + server authorization + RLS path.
+- Data: production uses Supabase/Postgres/Auth/RLS through a narrow client adapter; local preview remains available only when Supabase Vite env vars are absent.
+- Auth/security: production account creation and sign-in use Supabase Auth; admin access remains a simple `admin_users` allowlist enforced by RLS.
 - API: TanStack Start server-ready functions/routes when persistence is introduced; no GraphQL/public API for MVP.
 - Deployment: Cloudflare Pages deployment first; avoid paid Project Surf infrastructure.
 
@@ -148,17 +148,17 @@ Project initialization using this monorepo shape should remain the first impleme
 
 **Deferred Decisions:**
 
-- Supabase production persistence, RLS SQL policies, Resend transactional sending, Playwright E2E, analytics, reusable family profiles, recurring events, background jobs, realtime updates, queues, payments, waitlists, complex roles, and live check-in/out remain post-first-working-product unless specifically pulled forward.
+- Resend transactional sending, Playwright E2E, analytics, reusable family profiles, recurring events, background jobs, realtime updates, queues, payments, waitlists, complex roles, and live check-in/out remain post-first-working-product unless specifically pulled forward.
 
 ### Data Architecture
 
-The first working product may use local browser persistence through a narrow domain adapter so the product can run with no paid services. The production-ready path remains Supabase Postgres/Auth/RLS because it satisfies the free-tier and privacy constraints better than enterprise services.
+The first working product now supports Supabase Postgres/Auth/RLS in production and keeps local browser persistence as a preview fallback for development without paid services.
 
 Model core domain concepts around `profiles`, `admin_users`, `events`, `registrations`, `registration_age_counts`, `notification_log`, and `audit_log`. When database persistence is introduced, prefer a `packages/db` package using Drizzle/Postgres patterns similar to Project Surf, backed by Supabase Postgres for free-tier hosting.
 
 ### Authentication & Security
 
-Use demo/local auth for the first working product only. Preserve clear boundaries so Supabase Auth can replace the local adapter without changing feature UI contracts. Admin access remains a simple allowlist concept, not a complex role hierarchy.
+Use Supabase Auth in production. Preserve demo/local auth only for local preview mode when Supabase env vars are absent. Admin access remains a simple allowlist concept, not a complex role hierarchy.
 
 Authorization layers for production path:
 

@@ -38,6 +38,9 @@ jobs:
         run: bun test
 
       - name: Build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: bun run build
 
       - name: Upload web artifact
@@ -49,7 +52,9 @@ jobs:
 
   deploy-web:
     name: Deploy web to Cloudflare Pages
-    needs: validate
+    needs:
+      - validate
+      - deploy-supabase
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     environment:

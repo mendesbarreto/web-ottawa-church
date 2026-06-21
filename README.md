@@ -9,7 +9,7 @@ Church website, participant portal, and admin event workflow for a free-tier-fir
 - Web app: React, TanStack Router, Vite, Tailwind CSS/shadcn-style components
 - Domain package: framework-independent TypeScript event, registration, RSVP, CSV, and calendar logic
 - Deployment target: Cloudflare Pages for the web app
-- Future services: Supabase free tier for auth/database and Resend free tier for email
+- Production services: Supabase free tier for auth/database; Resend-compatible email remains a later adapter
 
 ## Local Development
 
@@ -19,6 +19,16 @@ bun --filter @ottawa-church/web dev
 ```
 
 Open `http://127.0.0.1:3000/`.
+
+The app runs in local preview mode when Supabase Vite variables are absent. Local preview mode uses browser storage and exposes preview-only shortcuts such as the admin demo button.
+
+To run production mode locally:
+
+```bash
+export VITE_SUPABASE_URL="https://<project-id>.supabase.co"
+export VITE_SUPABASE_PUBLISHABLE_KEY="<supabase-anon-or-publishable-key>"
+bun --filter @ottawa-church/web dev
+```
 
 ## Validation
 
@@ -41,7 +51,15 @@ Use these settings when connecting the repository to Cloudflare Pages:
 
 ## Supabase Free Tier
 
-Apply `supabase/migrations/0001_church_events.sql` to create the production-ready tables and RLS policies for profiles, events, registrations, age-count rows, admin users, notification logs, and reminder logs.
+Apply all migrations in `supabase/migrations` to create the production tables, RLS policies, profile signup trigger, and participant RSVP RPC.
+
+To grant the first admin account after signing up:
+
+```sql
+insert into public.admin_users (user_id)
+select id from auth.users where email = 'admin@example.com'
+on conflict do nothing;
+```
 
 ## CI Deployment
 
@@ -51,12 +69,14 @@ Required GitHub secrets for web deployment:
 
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
 
 Optional GitHub variable:
 
 - `CLOUDFLARE_PROJECT_NAME` defaults to `web-ottawa-church`
 
-Optional GitHub secrets for applying Supabase migrations:
+Required GitHub secrets for applying Supabase migrations:
 
 - `SUPABASE_ACCESS_TOKEN`
 - `SUPABASE_PROJECT_ID`

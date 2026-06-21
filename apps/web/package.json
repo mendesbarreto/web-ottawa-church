@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@ottawa-church/domain": "workspace:*",
+    "@supabase/supabase-js": "^2.108.2",
     "@tanstack/react-router": "1.170.5",
     "@vitejs/plugin-react": "6.0.1",
     "lucide-react": "0.545.0",
