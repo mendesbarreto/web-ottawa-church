@@ -59,5 +59,5 @@ Optional GitHub variable:
 Optional GitHub secrets for applying Supabase migrations:
 
 - `SUPABASE_ACCESS_TOKEN`
-- `SUPABASE_PROJECT_REF`
+- `SUPABASE_PROJECT_ID`
 - `SUPABASE_DB_PASSWORD`
