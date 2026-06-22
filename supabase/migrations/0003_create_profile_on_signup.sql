@@ -9,7 +9,7 @@ begin
   values (
     new.id,
     coalesce(new.email, ''),
-    coalesce(new.raw_user_meta_data ->> 'name', ''),
+    coalesce(new.raw_user_meta_data ->> 'name', coalesce(new.raw_user_meta_data ->> 'full_name', '')),
     coalesce(new.raw_user_meta_data ->> 'phone', ''),
     coalesce(new.raw_user_meta_data ->> 'notes', '')
   )

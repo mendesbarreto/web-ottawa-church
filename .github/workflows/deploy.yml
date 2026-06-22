@@ -19,6 +19,9 @@ jobs:
   validate:
     name: Typecheck, test, and build
     runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,10 +40,13 @@ jobs:
       - name: Test
         run: bun test
 
+      - name: Verify Vite build envs are non-empty when deploying from master
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && (env.VITE_SUPABASE_URL == '' || env.VITE_SUPABASE_PUBLISHABLE_KEY == '')
+        run: |
+          echo "::error::VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY must be configured as secrets or the production build ships in local-preview mode."
+          exit 1
+
       - name: Build
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: bun run build
 
       - name: Upload web artifact
@@ -52,9 +58,7 @@ jobs:
 
   deploy-web:
     name: Deploy web to Cloudflare Pages
-    needs:
-      - validate
-      - deploy-supabase
+    needs: validate
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     environment:
@@ -67,11 +71,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.14
 
       - name: Download web artifact
         uses: actions/download-artifact@v4
@@ -99,26 +98,26 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Skip when Supabase secrets are absent
-        if: env.SUPABASE_ACCESS_TOKEN == '' || env.SUPABASE_PROJECT_ID == '' || env.SUPABASE_DB_PASSWORD == ''
+        if: env.SUPABASE_ACCESS_TOKEN == '' || env.SUPABASE_PROJECT_REF == '' || env.SUPABASE_DB_PASSWORD == ''
         run: echo "Supabase deploy skipped because one or more Supabase secrets are not configured."
 
       - name: Set up Supabase CLI
-        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_ID != '' && env.SUPABASE_DB_PASSWORD != ''
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' && env.SUPABASE_DB_PASSWORD != ''
         uses: supabase/setup-cli@v1
         with:
           version: latest
 
       - name: Link Supabase project
-        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_ID != '' && env.SUPABASE_DB_PASSWORD != ''
-        run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' && env.SUPABASE_DB_PASSWORD != ''
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
 
       - name: Push database migrations
-        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_ID != '' && env.SUPABASE_DB_PASSWORD != ''
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' && env.SUPABASE_DB_PASSWORD != ''
         run: supabase db push --password "$SUPABASE_DB_PASSWORD"

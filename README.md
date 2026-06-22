@@ -53,12 +53,16 @@ Use these settings when connecting the repository to Cloudflare Pages:
 
 Apply all migrations in `supabase/migrations` to create the production tables, RLS policies, profile signup trigger, and participant RSVP RPC.
 
-To grant the first admin account after signing up:
+To grant the first admin account after signing up. Verify the row was inserted (the inner `select` returns no rows if the email does not match an existing auth user, in which case no admin is granted):
 
 ```sql
 insert into public.admin_users (user_id)
 select id from auth.users where email = 'admin@example.com'
 on conflict do nothing;
+
+select user_id from public.admin_users where user_id = (
+  select id from auth.users where email = 'admin@example.com'
+);
 ```
 
 ## CI Deployment
@@ -79,5 +83,5 @@ Optional GitHub variable:
 Required GitHub secrets for applying Supabase migrations:
 
 - `SUPABASE_ACCESS_TOKEN`
-- `SUPABASE_PROJECT_ID`
+- `SUPABASE_PROJECT_REF`
 - `SUPABASE_DB_PASSWORD`

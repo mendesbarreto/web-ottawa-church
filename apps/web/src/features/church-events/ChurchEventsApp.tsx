@@ -52,6 +52,7 @@ import {
   updateSupabaseEventStatus,
   updateSupabaseProfile,
   updateSupabaseRsvp,
+  type ProductionSession,
 } from '#/lib/supabase';
 
 type DialogMode =
@@ -95,24 +96,33 @@ export function ChurchEventsApp() {
   useEffect(() => {
     if (!productionMode) return undefined;
     let active = true;
+    let pendingRefresh: Promise<void> | null = null;
     async function boot() {
       try {
         const session = await getCurrentSession();
-        const nextState = await loadProductionState(session);
-        if (active) setState(nextState);
+        if (active) {
+          pendingRefresh = refreshFromSession(session)
+            .finally(() => { pendingRefresh = null; });
+          await pendingRefresh;
+        }
       } catch (error) {
         if (active) setNotice(errorMessage(error));
       } finally {
         if (active) setLoading(false);
       }
     }
+    function refreshFromSession(session: ProductionSession | null) {
+      return loadProductionState(session)
+        .then((nextState) => { if (active) setState(nextState); })
+        .catch((error) => { if (active) setNotice(errorMessage(error)); });
+    }
     void boot();
     return onAuthChange((session) => {
+      if (!active) return;
+      if (pendingRefresh) return;
       setLoading(true);
-      loadProductionState(session)
-        .then(setState)
-        .catch((error) => setNotice(errorMessage(error)))
-        .finally(() => setLoading(false));
+      pendingRefresh = refreshFromSession(session)
+        .finally(() => { pendingRefresh = null; setLoading(false); });
     });
   }, [productionMode]);
 
@@ -153,6 +163,10 @@ export function ChurchEventsApp() {
       try {
         setLoading(true);
         const session = await signInWithSupabase(email, password);
+        if (!session) {
+          setNotice('Sign-in pending. Check your email to confirm your account, then try again.');
+          return;
+        }
         const nextState = await loadProductionState(session);
         setState(nextState);
         setNotice('Signed in.');
@@ -172,14 +186,22 @@ export function ChurchEventsApp() {
   }
 
   async function handleSignup(input: { name: string; email: string; phone: string; password: string }, event?: ChurchEvent) {
+    const validationErrors = validateProfile(input);
+    if (input.password.length < 6) validationErrors.push('Password must be at least 6 characters.');
+    if (validationErrors.length) throw new Error(validationErrors.join('\n'));
     if (productionMode) {
       try {
         setLoading(true);
         const session = await createSupabaseAccount(input);
-        const nextState = await loadProductionState(session);
-        setState(nextState);
-        setNotice(session ? 'Account created. You can now register for events.' : 'Account created. Check your email to confirm sign in.');
-        setDialog(session && event ? { type: 'register', event } : { type: 'none' });
+        if (session) {
+          const nextState = await loadProductionState(session);
+          setState(nextState);
+          setNotice('Account created. You can now register for events.');
+          setDialog(event ? { type: 'register', event } : { type: 'none' });
+        } else {
+          setNotice('Account created. Check your email to confirm sign in, then return to register.');
+          setDialog({ type: 'none' });
+        }
       } catch (error) {
         setNotice(errorMessage(error));
         throw error;
@@ -297,11 +319,11 @@ export function ChurchEventsApp() {
   }
 
   function visiblePage() {
-    if (loading) return <GateCard title="Loading" description="Loading church events and account state." />;
     if (pathname === '/about') return <AboutPage />;
     if (pathname === '/service-times-location') return <ServicePage />;
     if (pathname === '/contact') return <ContactPage />;
-    if (pathname === '/portal') return <PortalPage state={state} activeUser={activeUser} onRsvp={handleRsvp} />;
+    if (loading) return <GateCard title="Loading" description="Loading church events and account state." />;
+    if (pathname === '/portal') return <PortalPage state={state} activeUser={activeUser} onRsvp={handleRsvp} onInfo={setNotice} />;
     if (pathname === '/profile') return <ProfilePage activeUser={activeUser} onSave={handleProfileSave} />;
     if (pathname === '/admin') {
       return <AdminPage
@@ -443,7 +465,7 @@ function EventTable({ events, registrations, activeUser, setDialog, onCalendar }
   );
 }
 
-function PortalPage({ state, activeUser, onRsvp }: { state: AppState; activeUser: User | null; onRsvp: (registration: Registration, rsvpStatus: RsvpStatus) => Promise<void> }) {
+function PortalPage({ state, activeUser, onRsvp, onInfo }: { state: AppState; activeUser: User | null; onRsvp: (registration: Registration, rsvpStatus: RsvpStatus) => Promise<void>; onInfo: (message: string) => void }) {
   if (!activeUser) return <GateCard title="Sign in required" description="Use Sign in or Sign up to see your registrations." />;
   const mine = state.registrations
     .filter((registration) => registration.userId === activeUser.id)
@@ -461,7 +483,8 @@ function PortalPage({ state, activeUser, onRsvp }: { state: AppState; activeUser
             <thead><tr><th>Event</th><th>Location</th><th>Approval</th><th>RSVP</th><th>Group</th><th>Actions</th></tr></thead>
             <tbody>
               {mine.map((registration) => {
-                const event = state.events.find((item) => item.id === registration.eventId)!;
+                const event = state.events.find((item) => item.id === registration.eventId);
+                if (!event) return null;
                 const actions: Array<{ label: string; action: RowAction }> = registration.approvalStatus === 'approved'
                   ? [
                     { label: 'Mark attending', action: () => onRsvp(registration, 'attending') },
@@ -470,7 +493,7 @@ function PortalPage({ state, activeUser, onRsvp }: { state: AppState; activeUser
                       return onRsvp(registration, 'not_attending');
                     } },
                   ]
-                  : [{ label: 'RSVP available after approval', action: () => undefined }];
+                  : [{ label: 'RSVP opens after approval', action: () => onInfo('RSVP opens after an admin approves your registration.') }];
                 return <tr key={registration.id}>
                   <td data-label="Event"><strong>{event.title}</strong><small>{formatDateTime(event.startsAt)}</small></td>
                   <td data-label="Location">{event.location}</td>
@@ -726,6 +749,7 @@ function EventForm({ mode, event, onSave, close }: { mode: 'create' | 'edit'; ev
   }
   async function submit(submitEvent: FormEvent) {
     submitEvent.preventDefault();
+    if (submitting) return;
     setSubmitting(true);
     setErrors([]);
     try {
@@ -743,6 +767,7 @@ function EventForm({ mode, event, onSave, close }: { mode: 'create' | 'edit'; ev
 function ReviewRegistrations({ event, state, activeUser, onApproval }: { event: ChurchEvent; state: AppState; activeUser: User | null; onApproval: (registration: Registration, approvalStatus: 'approved' | 'declined') => Promise<void> }) {
   const [approvalFilter, setApprovalFilter] = useState<ApprovalStatus | 'all'>('pending');
   const [rsvpFilter, setRsvpFilter] = useState<RsvpStatus | 'all'>('all');
+  const [pending, setPending] = useState(false);
   if (!activeUser?.isAdmin) return <GateCard title="Admin access required" description="You do not have access to this page." />;
   const rows = state.registrations.filter((registration) => {
     const matchesEvent = registration.eventId === event.id;
@@ -750,9 +775,18 @@ function ReviewRegistrations({ event, state, activeUser, onApproval }: { event: 
     const matchesRsvp = rsvpFilter === 'all' || registration.rsvpStatus === rsvpFilter;
     return matchesEvent && matchesApproval && matchesRsvp;
   });
-  return <div className="dialog-content"><span className="eyebrow">Approval queue</span><h2>{event.title}</h2><p>{formatDateTime(event.startsAt)} · {event.location}</p><div className="filters"><label>Approval status<select value={approvalFilter} onChange={(event) => setApprovalFilter(event.target.value as ApprovalStatus | 'all')}><option value="all">All approval statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="declined">Declined</option></select></label><label>RSVP status<select value={rsvpFilter} onChange={(event) => setRsvpFilter(event.target.value as RsvpStatus | 'all')}><option value="all">All RSVP statuses</option><option value="unknown">Unknown</option><option value="attending">Attending</option><option value="not_attending">Not attending</option></select></label></div>{!rows.length ? <div className="empty-state">No pending registrations.</div> : <div className="table-card"><table><thead><tr><th>Participant</th><th>Counts</th><th>Status</th><th>Notes</th><th>Actions</th></tr></thead><tbody>{rows.map((registration) => <tr key={registration.id}><td data-label="Participant"><strong>{registration.participantName}</strong><small>{registration.email} · {registration.phone}</small></td><td data-label="Counts">{1 + registration.accompanyingCount} people<small>{ageRanges.map((range) => `${range}: ${registration.ageCounts[range]}`).join(' · ')}</small></td><td data-label="Status"><StatusBadge status={registration.approvalStatus} /> <StatusBadge status={registration.rsvpStatus} /></td><td data-label="Notes">{registration.notes || 'No notes.'}</td><td data-label="Actions"><RowMenu items={[
-    { label: 'Approve', action: () => onApproval(registration, 'approved') },
-    { label: 'Decline', action: () => onApproval(registration, 'declined') },
+  async function runApproval(registration: Registration, nextStatus: 'approved' | 'declined') {
+    if (pending) return;
+    setPending(true);
+    try {
+      await onApproval(registration, nextStatus);
+    } finally {
+      setPending(false);
+    }
+  }
+  return <div className="dialog-content"><span className="eyebrow">Approval queue</span><h2>{event.title}</h2><p>{formatDateTime(event.startsAt)} · {event.location}</p><div className="filters"><label>Approval status<select value={approvalFilter} onChange={(event) => setApprovalFilter(event.target.value as ApprovalStatus | 'all')} disabled={pending}><option value="all">All approval statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="declined">Declined</option></select></label><label>RSVP status<select value={rsvpFilter} onChange={(event) => setRsvpFilter(event.target.value as RsvpStatus | 'all')} disabled={pending}><option value="all">All RSVP statuses</option><option value="unknown">Unknown</option><option value="attending">Attending</option><option value="not_attending">Not attending</option></select></label></div>{!rows.length ? <div className="empty-state">No pending registrations.</div> : <div className="table-card"><table><thead><tr><th>Participant</th><th>Counts</th><th>Status</th><th>Notes</th><th>Actions</th></tr></thead><tbody>{rows.map((registration) => <tr key={registration.id}><td data-label="Participant"><strong>{registration.participantName}</strong><small>{registration.email} · {registration.phone}</small></td><td data-label="Counts">{1 + registration.accompanyingCount} people<small>{ageRanges.map((range) => `${range}: ${registration.ageCounts[range]}`).join(' · ')}</small></td><td data-label="Status"><StatusBadge status={registration.approvalStatus} /> <StatusBadge status={registration.rsvpStatus} /></td><td data-label="Notes">{registration.notes || 'No notes.'}</td><td data-label="Actions"><RowMenu items={[
+    { label: pending ? 'Working…' : 'Approve', action: () => runApproval(registration, 'approved') },
+    { label: pending ? 'Working…' : 'Decline', action: () => runApproval(registration, 'declined') },
   ]} /></td></tr>)}</tbody></table></div>}</div>;
 }
 
@@ -779,9 +813,25 @@ function StatusBadge({ status }: { status: string }) { return <span className={`
 
 function RowMenu({ items }: { items: Array<{ label: string; action: RowAction }> }) {
   const [open, setOpen] = useState(false);
-  return <div className="row-menu"><button className="icon-button" onClick={() => setOpen(!open)} aria-label="Open row actions"><MoreHorizontal size={18} /></button>{open ? <div className="menu-panel">{items.map((item) => <button key={item.label} onClick={() => { void item.action(); setOpen(false); }}>{item.label}</button>)}</div> : null}</div>;
+  async function runAction(item: { label: string; action: RowAction }) {
+    try {
+      const result = await item.action();
+      if (result === false) return;
+      setOpen(false);
+    } catch (error) {
+      setOpen(false);
+      throw error;
+    }
+  }
+  return <div className="row-menu"><button className="icon-button" onClick={() => setOpen(!open)} aria-label="Open row actions"><MoreHorizontal size={18} /></button>{open ? <div className="menu-panel">{items.map((item) => <button key={item.label} disabled={item.action instanceof Promise} onClick={() => { void runAction(item).catch(() => { /* error already surfaced by caller via setNotice */ }); }}>{item.label}</button>)}</div> : null}</div>;
 }
 
 function errorMessage(error: unknown) {
-  return error instanceof Error ? error.message : 'Something went wrong.';
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: unknown }).message;
+    if (typeof message === 'string' && message.trim()) return message;
+  }
+  if (typeof error === 'string' && error.trim()) return error;
+  return 'Something went wrong.';
 }
