@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 3.1: Event Registration Entry Flow
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,16 +21,16 @@ so that I can submit my intent to attend a specific event.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Register entry (AC: #1, #2)
-  - [ ] Verify `register` `DialogMode` opens carrying the `ChurchEvent`
-  - [ ] Confirm modal header shows title, `formatDateTime(startsAt)`, location
-- [ ] Task 2 — Event-specific capture only (AC: #3)
-  - [ ] Confirm registration modal captures accompanying/age counts/notes only (no account fields)
-- [ ] Task 3 — Signed-out routing (AC: #4)
-  - [ ] Verify Register click when signed-out opens `signin`/`signup` carrying the event
-  - [ ] Verify post-auth returns to `register` dialog for that event (`handleSignIn`/`handleSignup` accept `event?`)
-- [ ] Task 4 — Registration-open gating (AC: #1)
-  - [ ] Confirm `event.registrationOpen === false` blocks registration (domain `registerForEvent` + production RPC)
+- [x] Task 1 — Register entry (AC: #1, #2)
+  - [x] Verify `register` `DialogMode` opens carrying the `ChurchEvent`
+  - [x] Confirm modal header shows title, `formatDateTime(startsAt)`, location
+- [x] Task 2 — Event-specific capture only (AC: #3)
+  - [x] Confirm registration modal captures accompanying/age counts/notes only (no account fields)
+- [x] Task 3 — Signed-out routing (AC: #4)
+  - [x] Verify Register click when signed-out opens `signin`/`signup` carrying the event
+  - [x] Verify post-auth returns to `register` dialog for that event (`handleSignIn`/`handleSignup` accept `event?`)
+- [x] Task 4 — Registration-open gating (AC: #1)
+  - [x] Confirm `event.registrationOpen === false` blocks registration (domain `registerForEvent` + production RPC)
 
 ## Dev Notes
 
@@ -59,8 +63,18 @@ Build specs are `done`. Registration entry: `handleRegistration` (`ChurchEventsA
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified register DialogMode opens carrying the ChurchEvent; modal header shows title, formatDateTime(startsAt), location. Registration modal captures accompanyingCount/ageCounts/notes only (no account fields). Signed-out Register click opens signin/signup carrying the event; post-auth handleSignIn/handleSignup accept event? and reopen the register dialog. Registration-open gating: registerForEvent checks status==='published' and registrationOpen; production create_registration RPC + migration 0004 restrict closed-event inserts. Added tests for closed/draft event blocking. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, apps/web/src/lib/supabase.ts, packages/domain/src/index.ts; Test additions: packages/domain/src/index.test.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

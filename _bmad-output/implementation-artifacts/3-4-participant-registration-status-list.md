@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 3.4: Participant Registration Status List
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,14 +21,14 @@ so that I know whether I am pending, approved, declined, or not attending.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Dashboard list (AC: #1, #2)
-  - [ ] Verify `PortalPage` (`/portal`) lists `activeUser`'s registrations with event title/date/location
-  - [ ] Confirm Approval Status + RSVP Status badges + row action menu per row
-- [ ] Task 2 — Text status badges (AC: #3)
-  - [ ] Confirm `statusLabel` renders text (not color only) for pending/approved/declined/attending/not attending
-- [ ] Task 3 — Privacy boundary (AC: #4)
-  - [ ] Local: list filters registrations by `activeUser.id`
-  - [ ] Production: `loadProductionState` relies on RLS to scope registrations to the requesting user (verify migration 0001 RLS)
+- [x] Task 1 — Dashboard list (AC: #1, #2)
+  - [x] Verify `PortalPage` (`/portal`) lists `activeUser`'s registrations with event title/date/location
+  - [x] Confirm Approval Status + RSVP Status badges + row action menu per row
+- [x] Task 2 — Text status badges (AC: #3)
+  - [x] Confirm `statusLabel` renders text (not color only) for pending/approved/declined/attending/not attending
+- [x] Task 3 — Privacy boundary (AC: #4)
+  - [x] Local: list filters registrations by `activeUser.id`
+  - [x] Production: `loadProductionState` relies on RLS to scope registrations to the requesting user (verify migration 0001 RLS)
 
 ## Dev Notes
 
@@ -58,8 +62,18 @@ Build specs are `done`. `PortalPage` rendered at `/portal` via `visiblePage()` (
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified PortalPage (/portal) lists activeUser's registrations filtered by userId, sorted by approval status then event date; each row shows event title/date/location, Approval + RSVP StatusBadges, group size, and RowMenu. statusLabel renders text (not color-only) - unit tested. Privacy boundary: local list filters by activeUser.id; production relies on RLS 'registrations own or admin read' (migration 0001) to scope registrations to the requesting user. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, apps/web/src/lib/supabase.ts, packages/domain/src/index.ts, supabase/migrations/0001_church_events.sql; Test additions: packages/domain/src/index.test.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

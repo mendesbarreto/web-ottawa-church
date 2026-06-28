@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 2.4: Authenticated Navigation and Access States
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,15 +21,15 @@ so that I can reach my dashboard, events, profile, and sign out actions.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Signed-out nav (AC: #1, #2)
-  - [ ] Verify header shows Sign in + Sign up, no Dashboard/Profile/Admin links when `activeUser` null
-- [ ] Task 2 — Signed-in nav (AC: #3)
-  - [ ] Verify Dashboard (`/portal`), Profile (`/profile`), Sign out, user chip render when `activeUser` present
-  - [ ] Verify Admin link only when `activeUser.isAdmin`
-- [ ] Task 3 — Sign out (AC: #3)
-  - [ ] Local: clears `activeUserId`; Production: `signOutOfSupabase`
-- [ ] Task 4 — Mobile/keyboard (AC: #4)
-  - [ ] Confirm nav reachable by keyboard, 44px targets, collapses on mobile
+- [x] Task 1 — Signed-out nav (AC: #1, #2)
+  - [x] Verify header shows Sign in + Sign up, no Dashboard/Profile/Admin links when `activeUser` null
+- [x] Task 2 — Signed-in nav (AC: #3)
+  - [x] Verify Dashboard (`/portal`), Profile (`/profile`), Sign out, user chip render when `activeUser` present
+  - [x] Verify Admin link only when `activeUser.isAdmin`
+- [x] Task 3 — Sign out (AC: #3)
+  - [x] Local: clears `activeUserId`; Production: `signOutOfSupabase`
+- [x] Task 4 — Mobile/keyboard (AC: #4)
+  - [x] Confirm nav reachable by keyboard, 44px targets, collapses on mobile
 
 ## Dev Notes
 
@@ -57,8 +61,18 @@ Build specs are `done`. Header nav rendered in `ChurchEventsApp.tsx:344`. Condit
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified signed-out header shows Sign in + Sign up with no Dashboard/Profile/Admin links when activeUser is null. Signed-in header renders Dashboard (/portal), Profile (/profile), Sign out, and user-chip; Admin link only when activeUser.isAdmin. Sign out clears activeUserId (local) or signOutOfSupabase (production). Nav reachable by keyboard, 44px targets, collapses on mobile via @media(max-width:820px). Known divergence: Admin nav is a single link rather than the full UX-DR6 set - tracked, not a regression. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx; Hardened: apps/web/src/styles.css
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

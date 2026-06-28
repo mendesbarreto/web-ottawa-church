@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 1.5: Public Calendar Export
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,16 +21,16 @@ so that I can keep the event details in my personal calendar app.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — `.ics` generation (AC: #1, #2)
-  - [ ] Verify `generateIcs(event, siteUrl)` produces valid VCALENDAR/VEVENT (DTSTART/DTEND, SUMMARY, LOCATION, DESCRIPTION with URL)
-  - [ ] Verify line endings are CRLF (`\r\n`) and escaping handles `\\;,` and newlines
-- [ ] Task 2 — Download path (AC: #1, #4)
-  - [ ] Verify `handleCalendar` → `downloadFile(`${event.id}.ics`, generateIcs(event, window.location.origin), 'text/calendar;charset=utf-8')`
-  - [ ] Confirm `download.ts` Blob + object URL fallback works when open fails
-- [ ] Task 3 — No sync requirement (AC: #3)
-  - [ ] Confirm no calendar write-back / OAuth — pure file download
-- [ ] Task 4 — Tests (AC: #1, #2)
-  - [ ] Confirm `packages/domain/src/index.test.ts` 'exports' suite asserts `BEGIN:VCALENDAR` + `SUMMARY:...`
+- [x] Task 1 — `.ics` generation (AC: #1, #2)
+  - [x] Verify `generateIcs(event, siteUrl)` produces valid VCALENDAR/VEVENT (DTSTART/DTEND, SUMMARY, LOCATION, DESCRIPTION with URL)
+  - [x] Verify line endings are CRLF (`\r\n`) and escaping handles `\\;,` and newlines
+- [x] Task 2 — Download path (AC: #1, #4)
+  - [x] Verify `handleCalendar` → `downloadFile(`${event.id}.ics`, generateIcs(event, window.location.origin), 'text/calendar;charset=utf-8')`
+  - [x] Confirm `download.ts` Blob + object URL fallback works when open fails
+- [x] Task 3 — No sync requirement (AC: #3)
+  - [x] Confirm no calendar write-back / OAuth — pure file download
+- [x] Task 4 — Tests (AC: #1, #2)
+  - [x] Confirm `packages/domain/src/index.test.ts` 'exports' suite asserts `BEGIN:VCALENDAR` + `SUMMARY:...`
 
 ## Dev Notes
 
@@ -58,8 +62,19 @@ Build specs are `done`. Implemented and tested: `generateIcs` in `packages/domai
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified generateIcs(event, siteUrl) produces valid VCALENDAR/VEVENT with DTSTART/DTEND, SUMMARY, LOCATION, DESCRIPTION embedding the event URL, UID, VERSION, PRODID. Line endings are CRLF (join('
+')); escapeText escapes \;, and newlines. handleCalendar -> downloadFile(`${event.id}.ics`, generateIcs(...), 'text/calendar;charset=utf-8'); download.ts uses Blob + object URL (download fallback). No calendar write-back/OAuth. Strengthened the 'ics calendar structure' test suite asserting title/date/location/URL/CRLF/escaping. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: packages/domain/src/index.ts, apps/web/src/lib/download.ts, apps/web/src/features/church-events/ChurchEventsApp.tsx; Test additions: packages/domain/src/index.test.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

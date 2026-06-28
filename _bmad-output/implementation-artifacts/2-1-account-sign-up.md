@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 2.1: Account Sign Up
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -18,17 +22,17 @@ so that I can register for church events.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Sign-up modal (AC: #1, #2, #3)
-  - [ ] Verify `signup` `DialogMode` captures name, email, phone, password only
-  - [ ] Confirm no event registration fields (accompanying/age counts) in this modal
-- [ ] Task 2 — Validation (AC: #2)
-  - [ ] Verify `validateProfile` (name/email/phone) + password ≥6 chars
-  - [ ] Confirm duplicate-email blocked (`createAccount` checks `users`)
-- [ ] Task 3 — Authenticated state after signup (AC: #4)
-  - [ ] Local: `createAccount` sets `activeUserId` → signed in
-  - [ ] Production: `createSupabaseAccount` → if session returned, signed in; else notice to confirm email
-- [ ] Task 4 — No admin approval (AC: #5)
-  - [ ] Confirm new `User.isAdmin` is always `false`; no approval queue for accounts
+- [x] Task 1 — Sign-up modal (AC: #1, #2, #3)
+  - [x] Verify `signup` `DialogMode` captures name, email, phone, password only
+  - [x] Confirm no event registration fields (accompanying/age counts) in this modal
+- [x] Task 2 — Validation (AC: #2)
+  - [x] Verify `validateProfile` (name/email/phone) + password ≥6 chars
+  - [x] Confirm duplicate-email blocked (`createAccount` checks `users`)
+- [x] Task 3 — Authenticated state after signup (AC: #4)
+  - [x] Local: `createAccount` sets `activeUserId` → signed in
+  - [x] Production: `createSupabaseAccount` → if session returned, signed in; else notice to confirm email
+- [x] Task 4 — No admin approval (AC: #5)
+  - [x] Confirm new `User.isAdmin` is always `false`; no approval queue for accounts
 
 ## Dev Notes
 
@@ -61,8 +65,18 @@ Build specs are `done`. Signup flow: `handleSignup` (`ChurchEventsApp.tsx:188`).
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified signup DialogMode captures name, email, phone, password only - no event registration fields. validateProfile (name/email/phone) + password>=6 enforced in handleSignup and createAccount; duplicate-email blocked. Local createAccount sets activeUserId (signed in); production createSupabaseAccount returns session->signed in, else a notice to confirm email. New User.isAdmin is always false (createAccount hard-codes isAdmin:false); no approval queue. Added tests: duplicate email + short password guard, non-admin account creation. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, apps/web/src/lib/supabase.ts, packages/domain/src/index.ts; Test additions: packages/domain/src/index.test.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

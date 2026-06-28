@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 1.4: Public Event Details
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,14 +21,14 @@ so that I know whether the event is relevant and what I need to prepare.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Details modal rendering (AC: #1, #4)
-  - [ ] Verify `details` dialog mode opens for a `ChurchEvent`
-  - [ ] Confirm date/time + linked location (`mapsUrl`) render before description
-  - [ ] Confirm capacity, cost, ageGroup, requiredItems, waiver, transportation, volunteerNeeds, registration note render when provided
-- [ ] Task 2 — Empty-field hiding (AC: #2)
-  - [ ] Confirm blank optional strings are omitted (no empty placeholders)
-- [ ] Task 3 — Privacy boundary (AC: #3)
-  - [ ] Confirm public `details` view never reads `state.registrations` participant names/emails/phones
+- [x] Task 1 — Details modal rendering (AC: #1, #4)
+  - [x] Verify `details` dialog mode opens for a `ChurchEvent`
+  - [x] Confirm date/time + linked location (`mapsUrl`) render before description
+  - [x] Confirm capacity, cost, ageGroup, requiredItems, waiver, transportation, volunteerNeeds, registration note render when provided
+- [x] Task 2 — Empty-field hiding (AC: #2)
+  - [x] Confirm blank optional strings are omitted (no empty placeholders)
+- [x] Task 3 — Privacy boundary (AC: #3)
+  - [x] Confirm public `details` view never reads `state.registrations` participant names/emails/phones
 
 ## Dev Notes
 
@@ -55,8 +59,18 @@ Build specs are `done`. Details surface is the `details` `DialogMode` inside `Ch
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified details DialogMode opens for a ChurchEvent and renders date/time + linked location BEFORE description (EventDetails). Capacity, cost, ageGroup, requiredItems, waiver, transportation, volunteerNeeds, and registration note render only when provided (conditional {field ? <Detail/> : null}). Privacy boundary confirmed: the public details view receives the event only; it reads registrations solely to show an aggregate 'approved registration(s)' count for signed-in users, never participant names/emails/phones. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, packages/domain/src/index.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

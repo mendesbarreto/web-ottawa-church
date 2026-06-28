@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 3.5: RSVP Status Update
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -18,14 +22,14 @@ so that organizers have accurate planning totals.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — RSVP mutation (AC: #1, #2)
-  - [ ] Verify `updateRsvp` changes only `rsvpStatus`, never `approvalStatus` (domain)
-  - [ ] Production: `update_own_rsvp` RPC (security definer) updates only own approved row
-- [ ] Task 2 — Confirmation (AC: #3, #4)
-  - [ ] Confirm confirmation flow for planning-sensitive change
-  - [ ] Confirm microcopy "You marked this event as not attending." / "RSVP saved as attending."
-- [ ] Task 3 — Failure revert (AC: #5)
-  - [ ] Verify failed save shows error and keeps prior state (production: `runProduction` catch sets notice, state refreshed)
+- [x] Task 1 — RSVP mutation (AC: #1, #2)
+  - [x] Verify `updateRsvp` changes only `rsvpStatus`, never `approvalStatus` (domain)
+  - [x] Production: `update_own_rsvp` RPC (security definer) updates only own approved row
+- [x] Task 2 — Confirmation (AC: #3, #4)
+  - [x] Confirm confirmation flow for planning-sensitive change
+  - [x] Confirm microcopy "You marked this event as not attending." / "RSVP saved as attending."
+- [x] Task 3 — Failure revert (AC: #5)
+  - [x] Verify failed save shows error and keeps prior state (production: `runProduction` catch sets notice, state refreshed)
 
 ## Dev Notes
 
@@ -59,8 +63,18 @@ Build specs are `done`. `handleRsvp` (`ChurchEventsApp.tsx:248`). Domain: `updat
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified updateRsvp changes only rsvpStatus, never approvalStatus (domain). Production update_own_rsvp RPC (security definer, migration 0002) updates only the row where user_id=auth.uid() AND approval_status='approved'. Confirmation flow: not_attending uses window.confirm; microcopy 'You marked this event as not attending.' / 'RSVP saved as attending.'. Failure revert: runProduction catch sets a notice and refreshes state (no stale optimistic update). typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, apps/web/src/lib/supabase.ts, packages/domain/src/index.ts, supabase/migrations/0002_harden_registration_updates.sql
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 3.6: Participant Registration Privacy and Security
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,13 +21,13 @@ so that only I and authorized Admins can access them.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Ownership scoping (AC: #1, #2)
-  - [ ] Verify local list filters by `activeUser.id`
-  - [ ] Verify RLS policies on `registrations` + `registration_age_counts` in migration 0001 enforce self/admin read
-- [ ] Task 2 — Minimal data collection (AC: #3)
-  - [ ] Confirm registration collects only accompanying count + age-range counts + notes (no child names/exact ages)
-- [ ] Task 3 — Public privacy (AC: #4)
-  - [ ] Confirm public event details path never reads registrations/participant names
+- [x] Task 1 — Ownership scoping (AC: #1, #2)
+  - [x] Verify local list filters by `activeUser.id`
+  - [x] Verify RLS policies on `registrations` + `registration_age_counts` in migration 0001 enforce self/admin read
+- [x] Task 2 — Minimal data collection (AC: #3)
+  - [x] Confirm registration collects only accompanying count + age-range counts + notes (no child names/exact ages)
+- [x] Task 3 — Public privacy (AC: #4)
+  - [x] Confirm public event details path never reads registrations/participant names
 
 ## Dev Notes
 
@@ -57,8 +61,18 @@ Build specs are `done`. Privacy-by-minimization is enforced by the domain types:
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified ownership scoping: local list filters by activeUser.id; RLS policies on registrations ('own or admin read') and registration_age_counts (own/admin read via subquery) in migration 0001 enforce self/admin read server-side. Minimal data collection: registration collects only accompanyingCount + ageCounts (0-3/4-12/13-17/18+) + notes - no child names or exact ages (UX-DR31). Public EventDetails never reads participant names/emails/phones. Admin authorization enforced server-side via RLS + security-definer RPCs, not React-only. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: packages/domain/src/index.ts, apps/web/src/features/church-events/ChurchEventsApp.tsx, supabase/migrations/0001_church_events.sql, supabase/migrations/0002_harden_registration_updates.sql; Test additions: packages/domain/src/index.test.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

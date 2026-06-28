@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 4.1: Admin Access and Event-Centered Navigation
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,16 +21,16 @@ so that I can manage church event operations.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Admin allowlist (AC: #1, #2)
-  - [ ] Verify admin detection: production `loadProductionState` reads `admin_users` table → `isAdmin`; local `User.isAdmin` flag
-  - [ ] Verify non-admin denied with "You do not have access to this page."
-- [ ] Task 2 — Admin surface (AC: #1)
-  - [ ] Verify `AdminPage` (`/admin`) shows admin dashboard with events/registrations/exports navigation
-- [ ] Task 3 — Server-side authorization (AC: #3)
-  - [ ] Verify every admin mutation (create/edit/archive/delete event, approve/decline, reminder, CSV) gates on admin + RLS
-  - [ ] Production: `set_registration_decision` RPC + `church_events` write RLS enforce admin
-- [ ] Task 4 — Mobile usability (AC: #4)
-  - [ ] Confirm admin tables become labeled stacked cards on small screens
+- [x] Task 1 — Admin allowlist (AC: #1, #2)
+  - [x] Verify admin detection: production `loadProductionState` reads `admin_users` table → `isAdmin`; local `User.isAdmin` flag
+  - [x] Verify non-admin denied with "You do not have access to this page."
+- [x] Task 2 — Admin surface (AC: #1)
+  - [x] Verify `AdminPage` (`/admin`) shows admin dashboard with events/registrations/exports navigation
+- [x] Task 3 — Server-side authorization (AC: #3)
+  - [x] Verify every admin mutation (create/edit/archive/delete event, approve/decline, reminder, CSV) gates on admin + RLS
+  - [x] Production: `set_registration_decision` RPC + `church_events` write RLS enforce admin
+- [x] Task 4 — Mobile usability (AC: #4)
+  - [x] Confirm admin tables become labeled stacked cards on small screens
 
 ## Dev Notes
 
@@ -59,8 +63,18 @@ Build specs are `done`. Admin link shown only when `activeUser?.isAdmin` (`Churc
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified admin detection: production loadProductionState reads admin_users -> isAdmin; local User.isAdmin flag. Non-admin denied with 'You do not have access to this page.' (GateCard). AdminPage (/admin) shows admin dashboard with event management, registrations/exports navigation. Server-side authorization: every admin mutation gates on admin via RLS ('admin events insert/update/delete') and the set_registration_decision RPC checks is_admin(). Mobile: admin tables become labeled stacked cards at <820px (@media in styles.css). typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, apps/web/src/lib/supabase.ts, packages/domain/src/index.ts, supabase/migrations/0001_church_events.sql, supabase/migrations/0002_harden_registration_updates.sql
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 4.3: Edit, Publish, Archive, and Delete Events
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,15 +21,15 @@ so that public event listings stay accurate.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Edit (AC: #1)
-  - [ ] Verify `edit-event` `DialogMode` → `handleEventSave(input, 'edit')` updates existing id
-  - [ ] Production: `saveSupabaseEvent` update on `input.id`
-- [ ] Task 2 — Publish/Archive (AC: #1, #2, #3)
-  - [ ] Verify `handleEventStatus` sets `published`/`archived` via `updateEventStatus`
-  - [ ] Confirm `publishedEvents` filter only shows `published`; archived excluded from public but retained
-- [ ] Task 3 — Delete with confirmation (AC: #1, #4)
-  - [ ] Verify `handleDeleteEvent` uses `window.confirm`; removes event + its registrations (`deleteEvent`)
-  - [ ] Production: `deleteSupabaseEvent`
+- [x] Task 1 — Edit (AC: #1)
+  - [x] Verify `edit-event` `DialogMode` → `handleEventSave(input, 'edit')` updates existing id
+  - [x] Production: `saveSupabaseEvent` update on `input.id`
+- [x] Task 2 — Publish/Archive (AC: #1, #2, #3)
+  - [x] Verify `handleEventStatus` sets `published`/`archived` via `updateEventStatus`
+  - [x] Confirm `publishedEvents` filter only shows `published`; archived excluded from public but retained
+- [x] Task 3 — Delete with confirmation (AC: #1, #4)
+  - [x] Verify `handleDeleteEvent` uses `window.confirm`; removes event + its registrations (`deleteEvent`)
+  - [x] Production: `deleteSupabaseEvent`
 
 ## Dev Notes
 
@@ -56,8 +60,18 @@ Build specs are `done`. `handleEventStatus` (`ChurchEventsApp.tsx:269`), `handle
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified edit-event DialogMode -> handleEventSave(input,'edit') updates the existing id; production saveSupabaseEvent update on input.id. handleEventStatus sets published/archived via updateEventStatus; publishedEvents filter excludes archived from public but retains them for admin. handleDeleteEvent uses window.confirm and removes the event + cascades its registrations (deleteEvent); production deleteSupabaseEvent (RLS admin delete). Existing test covers publish->archive->delete transitions. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, apps/web/src/lib/supabase.ts, packages/domain/src/index.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

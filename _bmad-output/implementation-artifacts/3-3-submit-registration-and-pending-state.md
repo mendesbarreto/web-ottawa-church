@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 3.3: Submit Registration and Pending State
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -18,16 +22,16 @@ so that the Admin team can review and approve my participation.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Pending creation (AC: #1)
-  - [ ] Verify `registerForEvent` creates registration with `approvalStatus: 'pending'`, `rsvpStatus: 'unknown'`
-  - [ ] Verify notification log appended (`registration_submitted`)
-- [ ] Task 2 — Duplicate prevention (AC: #2)
-  - [ ] Verify duplicate check: same eventId + userId + approvalStatus !== 'declined' blocked (domain + UI pre-check)
-- [ ] Task 3 — Confirmation (AC: #3, #4)
-  - [ ] Verify notice: "Your registration is pending approval. View it in your participant dashboard."
-  - [ ] Confirm dashboard route (`/portal`) reachable
-- [ ] Task 4 — Duplicate-submit guard (AC: #5)
-  - [ ] Confirm submit button disabled/pending during in-flight (production `runProduction` loading state)
+- [x] Task 1 — Pending creation (AC: #1)
+  - [x] Verify `registerForEvent` creates registration with `approvalStatus: 'pending'`, `rsvpStatus: 'unknown'`
+  - [x] Verify notification log appended (`registration_submitted`)
+- [x] Task 2 — Duplicate prevention (AC: #2)
+  - [x] Verify duplicate check: same eventId + userId + approvalStatus !== 'declined' blocked (domain + UI pre-check)
+- [x] Task 3 — Confirmation (AC: #3, #4)
+  - [x] Verify notice: "Your registration is pending approval. View it in your participant dashboard."
+  - [x] Confirm dashboard route (`/portal`) reachable
+- [x] Task 4 — Duplicate-submit guard (AC: #5)
+  - [x] Confirm submit button disabled/pending during in-flight (production `runProduction` loading state)
 
 ## Dev Notes
 
@@ -59,8 +63,18 @@ Build specs are `done`. `handleRegistration` (`ChurchEventsApp.tsx:231`) runs cl
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified registerForEvent creates registration with approvalStatus:'pending', rsvpStatus:'unknown' and appends a registration_submitted notification log. Duplicate prevention: same eventId+userId with approvalStatus!=='declined' blocked (domain + UI pre-check + production unique constraint). Confirmation notice 'Your registration is pending approval. View it in your participant dashboard.'; /portal reachable. Duplicate-submit guard: submit button disabled during in-flight via submitting state + runProduction loading. Added tests for duplicate blocking and notification log. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, packages/domain/src/index.ts; Test additions: packages/domain/src/index.test.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 2.2: Sign In and Auth Callback
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,17 +21,17 @@ so that I can access my profile, registrations, and event actions.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Sign-in modal (AC: #1, #3)
-  - [ ] Verify `signin` `DialogMode` reachable from header "Sign in" on public nav
-  - [ ] Local: `authenticateUser(state, email, password)`; Production: `signInWithSupabase`
-- [ ] Task 2 — Session establishment (AC: #1, #2)
-  - [ ] Production: `getCurrentSession` + `onAuthStateChange` → `loadProductionState(session)` sets state
-  - [ ] Confirm `getSupabaseClient` configured with `persistSession/autoRefreshToken/detectSessionInUrl`
-- [ ] Task 3 — Return-to-event after auth (AC: #4)
-  - [ ] Verify `handleSignIn(email, password, event?)` opens `register` dialog for that event after success
-  - [ ] Verify registration attempt while signed-out opens `signin`/`signup` with the event carried
-- [ ] Task 4 — Pending-email notice (AC: #1)
-  - [ ] Confirm notice when Supabase returns no session (email confirmation pending)
+- [x] Task 1 — Sign-in modal (AC: #1, #3)
+  - [x] Verify `signin` `DialogMode` reachable from header "Sign in" on public nav
+  - [x] Local: `authenticateUser(state, email, password)`; Production: `signInWithSupabase`
+- [x] Task 2 — Session establishment (AC: #1, #2)
+  - [x] Production: `getCurrentSession` + `onAuthStateChange` → `loadProductionState(session)` sets state
+  - [x] Confirm `getSupabaseClient` configured with `persistSession/autoRefreshToken/detectSessionInUrl`
+- [x] Task 3 — Return-to-event after auth (AC: #4)
+  - [x] Verify `handleSignIn(email, password, event?)` opens `register` dialog for that event after success
+  - [x] Verify registration attempt while signed-out opens `signin`/`signup` with the event carried
+- [x] Task 4 — Pending-email notice (AC: #1)
+  - [x] Confirm notice when Supabase returns no session (email confirmation pending)
 
 ## Dev Notes
 
@@ -59,8 +63,18 @@ Build specs are `done`. `handleSignIn` (`ChurchEventsApp.tsx:161`) branches prod
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified signin DialogMode reachable from header 'Sign in'. Local: authenticateUser(state,email,password); production: signInWithSupabase. Session establishment via getCurrentSession + onAuthStateChange -> loadProductionState; getSupabaseClient configured with persistSession/autoRefreshToken/detectSessionInUrl:true. Return-to-event after auth: handleSignIn(email,password,event?) opens the register dialog for that event on success; signed-out Register click opens signin/signup carrying the event. Pending-email notice shown when Supabase returns no session. No dedicated /auth/callback route file exists by design (detectSessionInUrl handles it). typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, apps/web/src/lib/supabase.ts, packages/domain/src/index.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

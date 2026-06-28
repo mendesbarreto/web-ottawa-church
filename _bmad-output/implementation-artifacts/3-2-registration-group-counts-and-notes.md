@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 3.2: Registration Group Counts and Notes
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -18,15 +22,15 @@ so that organizers have the planning information they need.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Count inputs (AC: #1, #2)
-  - [ ] Verify `validateRegistration` rejects negative/non-integer accompanying + each age range
-  - [ ] Verify total rule: `ageTotal === 1 + accompanyingCount`
-- [ ] Task 2 — Helper copy (AC: #3)
-  - [ ] Confirm UX-DR14 helper text present: include yourself in age ranges
-- [ ] Task 3 — Inline + summary validation (AC: #4)
-  - [ ] Confirm errors render inline near fields and as summary on submit failure
-- [ ] Task 4 — Notes privacy (AC: #5)
-  - [ ] Confirm `notes` stored on registration, visible to admin review, never on public event details
+- [x] Task 1 — Count inputs (AC: #1, #2)
+  - [x] Verify `validateRegistration` rejects negative/non-integer accompanying + each age range
+  - [x] Verify total rule: `ageTotal === 1 + accompanyingCount`
+- [x] Task 2 — Helper copy (AC: #3)
+  - [x] Confirm UX-DR14 helper text present: include yourself in age ranges
+- [x] Task 3 — Inline + summary validation (AC: #4)
+  - [x] Confirm errors render inline near fields and as summary on submit failure
+- [x] Task 4 — Notes privacy (AC: #5)
+  - [x] Confirm `notes` stored on registration, visible to admin review, never on public event details
 
 ## Dev Notes
 
@@ -59,8 +63,18 @@ Build specs are `done`. Validation: `validateRegistration` (`packages/domain/src
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified validateRegistration rejects negative/non-integer accompanying and each age range, and enforces ageTotal === 1 + accompanyingCount with helper message 'Include yourself in the age ranges.' RegistrationForm shows UX-DR14 helper copy. Errors render inline via ErrorList (summary on submit failure). Notes stored on registration, visible in admin ReviewRegistrations, never on public EventDetails. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, packages/domain/src/index.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

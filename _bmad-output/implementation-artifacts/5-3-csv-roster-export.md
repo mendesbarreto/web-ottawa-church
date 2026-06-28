@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 5.3: CSV Roster Export
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,13 +21,13 @@ so that I can use participant and planning data outside the system.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — CSV generation (AC: #1, #3)
-  - [ ] Verify `generateRosterCsv(event, registrations)` deterministic header + rows
-  - [ ] Confirm columns: Participant, Email, Phone, Approval Status, RSVP Status, Accompanying, Age 0-3/4-12/13-17/18+, Notes
-  - [ ] Confirm `csvCell` quoting for `",` and newlines
-- [ ] Task 2 — Admin-only (AC: #2, #4)
-  - [ ] Verify `handleCsv` guards `if (!activeUser?.isAdmin)` → notice "You do not have access to roster exports."
-  - [ ] Production: RLS scopes registrations to admin for full roster read
+- [x] Task 1 — CSV generation (AC: #1, #3)
+  - [x] Verify `generateRosterCsv(event, registrations)` deterministic header + rows
+  - [x] Confirm columns: Participant, Email, Phone, Approval Status, RSVP Status, Accompanying, Age 0-3/4-12/13-17/18+, Notes
+  - [x] Confirm `csvCell` quoting for `",` and newlines
+- [x] Task 2 — Admin-only (AC: #2, #4)
+  - [x] Verify `handleCsv` guards `if (!activeUser?.isAdmin)` → notice "You do not have access to roster exports."
+  - [x] Production: RLS scopes registrations to admin for full roster read
 
 ## Dev Notes
 
@@ -54,8 +58,18 @@ Build specs are `done`. `handleCsv` (`ChurchEventsApp.tsx:312`). Domain: `genera
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified generateRosterCsv(event, registrations) emits a deterministic header (Participant, Email, Phone, Approval Status, RSVP Status, Accompanying, Age 0-3/4-12/13-17/18+, Notes) + rows. csvCell quotes cells containing commas/quotes/newlines and doubles embedded quotes. Admin-only: handleCsv guards if(!activeUser?.isAdmin) -> notice 'You do not have access to roster exports.'; production RLS scopes registrations to admin for full roster read. Added CSV quoting + header-only + age-column tests. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: packages/domain/src/index.ts, apps/web/src/features/church-events/ChurchEventsApp.tsx; Test additions: packages/domain/src/index.test.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

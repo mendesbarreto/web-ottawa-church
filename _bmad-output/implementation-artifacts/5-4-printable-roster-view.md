@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 5.4: Printable Roster View
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,13 +21,13 @@ so that I can use a clean paper copy during planning or event operations.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Print surface (AC: #1, #3)
-  - [ ] Verify `print` `DialogMode` (or print route) renders print-optimized layout
-  - [ ] Confirm navigation/decorative UI hidden in print (`@media print`)
-- [ ] Task 2 — Planning data (AC: #2)
-  - [ ] Confirm participant, approval, RSVP, accompanying, age-range counts present
-- [ ] Task 3 — Admin-only (AC: #4)
-  - [ ] Verify print view gated on admin (client + RLS for the underlying registrations)
+- [x] Task 1 — Print surface (AC: #1, #3)
+  - [x] Verify `print` `DialogMode` (or print route) renders print-optimized layout
+  - [x] Confirm navigation/decorative UI hidden in print (`@media print`)
+- [x] Task 2 — Planning data (AC: #2)
+  - [x] Confirm participant, approval, RSVP, accompanying, age-range counts present
+- [x] Task 3 — Admin-only (AC: #4)
+  - [x] Verify print view gated on admin (client + RLS for the underlying registrations)
 
 ## Dev Notes
 
@@ -55,8 +59,18 @@ Build specs are `done`. Print surface: `print` `DialogMode` in `ChurchEventsApp.
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified print DialogMode (PrintableRoster) renders a print-optimized layout with participant, approval, RSVP, accompanying, and age-range data + event title/date/location context. @media print in styles.css hides site-header, site-footer, dialog-close, and .no-print (the Print button carries .no-print). Admin-only: print view opened only from the admin AdminPage; underlying registrations gated by RLS admin read. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, apps/web/src/styles.css
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

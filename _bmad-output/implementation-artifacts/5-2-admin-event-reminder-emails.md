@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 5.2: Admin Event Reminder Emails
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,16 +21,16 @@ so that approved participants receive practical event details before attending.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Reminder with confirmation (AC: #1)
-  - [ ] Verify `handleReminder` uses `window.confirm("Send reminder to approved participants...")`
-- [ ] Task 2 — Duplicate-send guard (AC: #2)
-  - [ ] Domain: `sendEventReminder` skips if a reminder was logged within 1 hour for the event
-  - [ ] Confirm skip log status `'skipped'`
-- [ ] Task 3 — Logging (AC: #3)
-  - [ ] Local: `reminderLogs` updated; Production: `createSupabaseReminderLog` inserts `reminder_logs`
-  - [ ] Confirm failures logged, registration data untouched
-- [ ] Task 4 — Roster fallback (AC: #4)
-  - [ ] Confirm CSV roster export remains available (Story 5.3) regardless of email availability
+- [x] Task 1 — Reminder with confirmation (AC: #1)
+  - [x] Verify `handleReminder` uses `window.confirm("Send reminder to approved participants...")`
+- [x] Task 2 — Duplicate-send guard (AC: #2)
+  - [x] Domain: `sendEventReminder` skips if a reminder was logged within 1 hour for the event
+  - [x] Confirm skip log status `'skipped'`
+- [x] Task 3 — Logging (AC: #3)
+  - [x] Local: `reminderLogs` updated; Production: `createSupabaseReminderLog` inserts `reminder_logs`
+  - [x] Confirm failures logged, registration data untouched
+- [x] Task 4 — Roster fallback (AC: #4)
+  - [x] Confirm CSV roster export remains available (Story 5.3) regardless of email availability
 
 ## Dev Notes
 
@@ -58,8 +62,18 @@ Build specs are `done`. `handleReminder` (`ChurchEventsApp.tsx:286`). Domain: `s
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified handleReminder uses window.confirm('Send reminder to approved participants...'). Duplicate-send guard: sendEventReminder skips if a reminder was logged for the event within 1 hour, with status 'skipped'. Logging: local reminderLogs updated; production createSupabaseReminderLog inserts reminder_logs (status queued/skipped per migration 0007). Failures logged, registration data untouched. CSV roster export remains available as a fallback (Story 5.3). Added reminder de-dupe/skip tests (1-hour window, no-approved skip). typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, apps/web/src/lib/supabase.ts, packages/domain/src/index.ts, supabase/migrations/0007_add_queued_log_status.sql; Test additions: packages/domain/src/index.test.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

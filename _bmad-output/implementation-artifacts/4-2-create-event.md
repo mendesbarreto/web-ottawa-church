@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 4.2: Create Event
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,15 +21,15 @@ so that participants can discover and register for it.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Create modal (AC: #1)
-  - [ ] Verify `create-event` `DialogMode` captures all `ChurchEvent` fields
-- [ ] Task 2 — Validation (AC: #2)
-  - [ ] Verify `validateEvent` requires title, startsAt/endsAt (end > start), location, status, capacity ≥1
-- [ ] Task 3 — Save flow (AC: #1, #4)
-  - [ ] Local: `saveEvent` inserts with generated id; `mapsUrl` defaulted from location
-  - [ ] Production: `saveSupabaseEvent` insert; draft status hides from public list
-- [ ] Task 4 — Optional fields (AC: #3)
-  - [ ] Confirm public details hides blank optional fields (Story 1.4 coupling)
+- [x] Task 1 — Create modal (AC: #1)
+  - [x] Verify `create-event` `DialogMode` captures all `ChurchEvent` fields
+- [x] Task 2 — Validation (AC: #2)
+  - [x] Verify `validateEvent` requires title, startsAt/endsAt (end > start), location, status, capacity ≥1
+- [x] Task 3 — Save flow (AC: #1, #4)
+  - [x] Local: `saveEvent` inserts with generated id; `mapsUrl` defaulted from location
+  - [x] Production: `saveSupabaseEvent` insert; draft status hides from public list
+- [x] Task 4 — Optional fields (AC: #3)
+  - [x] Confirm public details hides blank optional fields (Story 1.4 coupling)
 
 ## Dev Notes
 
@@ -57,8 +61,18 @@ Build specs are `done`. `handleEventSave(input, 'create')` (`ChurchEventsApp.tsx
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified create-event DialogMode (EventForm mode='create') captures all ChurchEvent fields. validateEvent requires title, startsAt/endsAt (end > start), location, status, capacity>=1. Local saveEvent inserts with generated id and defaults mapsUrl from location; production saveSupabaseEvent inserts via church_events (RLS admin insert). Draft status hides from public list (publishedEvents filter). Optional empty fields hidden in public details (conditional rendering). Added validateEvent error coverage tests. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, apps/web/src/lib/supabase.ts, packages/domain/src/index.ts; Test additions: packages/domain/src/index.test.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

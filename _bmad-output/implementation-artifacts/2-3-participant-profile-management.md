@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 2.3: Participant Profile Management
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,18 +21,18 @@ so that event organizers have the coordination information they need.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Profile view/edit (AC: #1, #4)
-  - [ ] Verify `ProfilePage` renders name/email/phone/notes with visible labels for `activeUser`
-  - [ ] Confirm inline validation near fields
-- [ ] Task 2 — Validation (AC: #2)
-  - [ ] Verify `validateProfile` blocks missing name/email/phone + invalid email
-  - [ ] Verify `updateProfile` blocks email collision with another account
-- [ ] Task 3 — Save flow (AC: #1)
-  - [ ] Local: `handleProfileSave` → `updateProfile` (also syncs denormalized participant fields on registrations)
-  - [ ] Production: `updateSupabaseProfile` updates `profiles` row
-- [ ] Task 4 — Visibility boundary (AC: #3)
-  - [ ] Confirm profile page only renders for signed-in user's own data
-  - [ ] Production: RLS on `profiles` enforces self-read (verify migration)
+- [x] Task 1 — Profile view/edit (AC: #1, #4)
+  - [x] Verify `ProfilePage` renders name/email/phone/notes with visible labels for `activeUser`
+  - [x] Confirm inline validation near fields
+- [x] Task 2 — Validation (AC: #2)
+  - [x] Verify `validateProfile` blocks missing name/email/phone + invalid email
+  - [x] Verify `updateProfile` blocks email collision with another account
+- [x] Task 3 — Save flow (AC: #1)
+  - [x] Local: `handleProfileSave` → `updateProfile` (also syncs denormalized participant fields on registrations)
+  - [x] Production: `updateSupabaseProfile` updates `profiles` row
+- [x] Task 4 — Visibility boundary (AC: #3)
+  - [x] Confirm profile page only renders for signed-in user's own data
+  - [x] Production: RLS on `profiles` enforces self-read (verify migration)
 
 ## Dev Notes
 
@@ -61,8 +65,18 @@ Build specs are `done`. `handleProfileSave` (`ChurchEventsApp.tsx:219`). Domain:
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified ProfilePage renders name/email/phone/notes with visible labels for activeUser, gated behind sign-in (GateCard otherwise). validateProfile blocks missing name/email/phone + invalid email; updateProfile blocks email collision. handleProfileSave -> updateProfile (syncs denormalized participant fields on that user's registrations); production updateSupabaseProfile updates profiles row. Visibility boundary: production RLS on profiles enforces self-read/update (migration 0001 policies 'profiles own read/update'). typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, apps/web/src/lib/supabase.ts, packages/domain/src/index.ts, supabase/migrations/0001_church_events.sql; Test additions: packages/domain/src/index.test.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

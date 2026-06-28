@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 1.3: Published Upcoming Events List
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,16 +21,16 @@ so that I can decide which church/community events I may want to attend.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Published-only filtering & sort (AC: #1, #3)
-  - [ ] Verify `publishedEvents` filters `status === 'published'` and sorts ascending by `startsAt`
-  - [ ] Confirm draft/archived never appear in `EventsHome`
-- [ ] Task 2 — Event row content (AC: #2)
-  - [ ] Confirm each row shows title, `formatDateTime(startsAt)`, summary, location, registration availability
-  - [ ] Confirm status badge + row action menu (Details/Register/Add to calendar)
-- [ ] Task 3 — Calendar action (AC: #2)
-  - [ ] Confirm "Add to calendar" row action calls `handleCalendar` → `downloadFile(...generateIcs...)`
-- [ ] Task 4 — Empty state (AC: #4)
-  - [ ] Confirm copy: "no upcoming events" when `publishedEvents` is empty
+- [x] Task 1 — Published-only filtering & sort (AC: #1, #3)
+  - [x] Verify `publishedEvents` filters `status === 'published'` and sorts ascending by `startsAt`
+  - [x] Confirm draft/archived never appear in `EventsHome`
+- [x] Task 2 — Event row content (AC: #2)
+  - [x] Confirm each row shows title, `formatDateTime(startsAt)`, summary, location, registration availability
+  - [x] Confirm status badge + row action menu (Details/Register/Add to calendar)
+- [x] Task 3 — Calendar action (AC: #2)
+  - [x] Confirm "Add to calendar" row action calls `handleCalendar` → `downloadFile(...generateIcs...)`
+- [x] Task 4 — Empty state (AC: #4)
+  - [x] Confirm copy: "no upcoming events" when `publishedEvents` is empty
 
 ## Dev Notes
 
@@ -57,8 +61,18 @@ Build specs are `done`. The events list lives in the `EventsHome` component insi
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified publishedEvents filters status==='published' and sorts ascending by startsAt (ChurchEventsApp.tsx:87). Draft/archived never reach EventsHome. Each EventTable row shows title, formatDateTime(startsAt), summary, location (linked mapsUrl), registration availability, StatusBadge, and RowMenu (Details/Register/Add to calendar). Empty state copy 'No upcoming events are published right now.' present. Added domain test asserting draft/archived exclusion from registration (registration edge cases suite). typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, packages/domain/src/index.ts; Test additions: packages/domain/src/index.test.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

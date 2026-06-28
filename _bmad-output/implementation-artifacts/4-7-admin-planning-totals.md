@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 4.7: Admin Planning Totals
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,13 +21,13 @@ so that I can plan food, space, transportation, and supervision.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Aggregate totals (AC: #1, #2, #3)
-  - [ ] Verify `eventTotals(eventId, registrations)` returns pending/approved/declined/attending/notAttending/people/ages
-  - [ ] Confirm people = sum(1 + accompanying) excluding declined; ages per range
-  - [ ] Confirm totals recompute after approval/RSVP changes (derived from current registrations)
-- [ ] Task 2 — Relational age counts (AC: #4)
-  - [ ] Domain: `ageCountRows(registration)` produces `{registrationId, ageRange, count}` rows
-  - [ ] Production: `registration_age_counts` table (relational), joined in `loadProductionState`
+- [x] Task 1 — Aggregate totals (AC: #1, #2, #3)
+  - [x] Verify `eventTotals(eventId, registrations)` returns pending/approved/declined/attending/notAttending/people/ages
+  - [x] Confirm people = sum(1 + accompanying) excluding declined; ages per range
+  - [x] Confirm totals recompute after approval/RSVP changes (derived from current registrations)
+- [x] Task 2 — Relational age counts (AC: #4)
+  - [x] Domain: `ageCountRows(registration)` produces `{registrationId, ageRange, count}` rows
+  - [x] Production: `registration_age_counts` table (relational), joined in `loadProductionState`
 
 ## Dev Notes
 
@@ -56,8 +60,18 @@ Build specs are `done`. `eventTotals` (`packages/domain/src/index.ts:426`) — s
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified eventTotals(eventId, registrations) returns pending/approved/declined/attending/notAttending/people/ages. people = sum(1 + accompanying) excluding declined; ages aggregated per range; totals recompute from current registrations after approval/RSVP changes. Relational age counts: domain ageCountRows produces {registrationId,ageRange,count} rows; production stores via registration_age_counts table (migration 0001) loaded via .in('registration_id', ids). Added planning-totals completeness tests (excludes declined, sums ages). typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: packages/domain/src/index.ts, apps/web/src/lib/supabase.ts, supabase/migrations/0001_church_events.sql; Test additions: packages/domain/src/index.test.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

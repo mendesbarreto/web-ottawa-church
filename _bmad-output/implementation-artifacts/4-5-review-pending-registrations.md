@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 4.5: Review Pending Registrations
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,13 +21,13 @@ so that I can decide who should be approved.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Review queue (AC: #1, #3)
-  - [ ] Verify `review` `DialogMode` (or admin event detail) lists registrations with participant name/email/phone, accompanying count, age counts, notes, approval status
-  - [ ] Confirm event context (title/date/location) retained while reviewing
-- [ ] Task 2 — Filter (AC: #2)
-  - [ ] Confirm filter by Approval Status (pending/approved/declined)
-- [ ] Task 3 — Empty state (AC: #4)
-  - [ ] Confirm "No pending registrations." copy when none
+- [x] Task 1 — Review queue (AC: #1, #3)
+  - [x] Verify `review` `DialogMode` (or admin event detail) lists registrations with participant name/email/phone, accompanying count, age counts, notes, approval status
+  - [x] Confirm event context (title/date/location) retained while reviewing
+- [x] Task 2 — Filter (AC: #2)
+  - [x] Confirm filter by Approval Status (pending/approved/declined)
+- [x] Task 3 — Empty state (AC: #4)
+  - [x] Confirm "No pending registrations." copy when none
 
 ## Dev Notes
 
@@ -54,8 +58,18 @@ Build specs are `done`. Review surface: `review` `DialogMode` in `ChurchEventsAp
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified review DialogMode lists registrations with participant name/email/phone, accompanying count, age counts, notes, and approval/rsvp status; event context (title/date/location) retained at the top of the review dialog. Filter by approval status (pending/approved/declined/all) and RSVP status present. Empty state copy 'No pending registrations.' present when no rows match. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, packages/domain/src/index.ts
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.

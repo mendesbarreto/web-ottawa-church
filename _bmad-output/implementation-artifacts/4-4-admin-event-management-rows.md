@@ -1,6 +1,10 @@
+---
+baseline_commit: 11281c34c1db5f65b20bb6245be6d1b79db33cd4
+---
+
 # Story 4.4: Admin Event Management Rows
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,15 +21,15 @@ so that I can quickly identify events needing attention.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Event rows with signals (AC: #1)
-  - [ ] Verify each admin event row shows status, pending count, approved count, age-range signal
-  - [ ] Confirm totals via `eventTotals(eventId, registrations)`
-- [ ] Task 2 — Row action menu (AC: #2)
-  - [ ] Confirm Review, Roster (CSV), Send reminder actions present + applicable (Details/Register/Add to calendar)
-- [ ] Task 3 — Responsive (AC: #3)
-  - [ ] Confirm tables become labeled stacked cards on `< 640px`
-- [ ] Task 4 — Filters (AC: #4)
-  - [ ] Confirm Approval/RSVP status filters, search, event date where applicable
+- [x] Task 1 — Event rows with signals (AC: #1)
+  - [x] Verify each admin event row shows status, pending count, approved count, age-range signal
+  - [x] Confirm totals via `eventTotals(eventId, registrations)`
+- [x] Task 2 — Row action menu (AC: #2)
+  - [x] Confirm Review, Roster (CSV), Send reminder actions present + applicable (Details/Register/Add to calendar)
+- [x] Task 3 — Responsive (AC: #3)
+  - [x] Confirm tables become labeled stacked cards on `< 640px`
+- [x] Task 4 — Filters (AC: #4)
+  - [x] Confirm Approval/RSVP status filters, search, event date where applicable
 
 ## Dev Notes
 
@@ -58,8 +62,18 @@ Build specs are `done`. `AdminPage` (`/admin` via `visiblePage()`) receives `onC
 
 ### Agent Model Used
 
+glm-5.2 (zai-coding-plan/glm-5.2)
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Verified each AdminPage event row shows status, pending count, approved count, and age-range signal via eventTotals(eventId, registrations). RowMenu includes Review registrations, Edit event, Publish/Archive, Delete, Export roster CSV, Printable roster, Send reminder. Tables become labeled stacked cards at <820px (@media rules with td::before data-label). Filters include event status select + search (admin); ReviewRegistrations adds Approval + RSVP status filters. typecheck + 29 tests pass.
+
 ### File List
+
+- Verified: apps/web/src/features/church-events/ChurchEventsApp.tsx, packages/domain/src/index.ts; Test additions: packages/domain/src/index.test.ts (planning totals completeness)
+
+## Change Log
+
+- 2026-06-27: Verified implementation against ACs; hardened domain test coverage and touch-target sizing. Status set to review.
